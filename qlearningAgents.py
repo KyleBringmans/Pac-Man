@@ -68,7 +68,7 @@ class QLearningAgent(ReinforcementAgent):
         for action in self.getLegalActions(state):  # calculate q-values for every possible action
             tempVals[(action)] = self.getQValue(state,action)
         return tempVals[tempVals.argMax()]
-
+        # max_a_Q(s_t+1,a)
 
     def computeActionFromQValues(self, state):
         """
@@ -76,7 +76,6 @@ class QLearningAgent(ReinforcementAgent):
           are no legal actions, which is the case at the terminal state,
           you should return None.
         """
-
 
         actionVals = self.getLegalActions(state)
 
@@ -121,6 +120,7 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         self.qValues[(state,action)] = (1-self.alpha) * self.getQValue(state,action) + self.alpha * (reward + self.discount * self.computeValueFromQValues(nextState))
+        # Q(s,a) = (1-a) * Q(s,a) + a * (R + gamma * max_a_Q(s_t+1,a))
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
@@ -182,15 +182,21 @@ class ApproximateQAgent(PacmanQAgent):
           Should return Q(state,action) = w * featureVector
           where * is the dotProduct operator
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        features = self.featExtractor.getFeatures(state,action)
+        q = 0
+        for feat in features:   # Q(s,a) = Sum: i -> n : f_i(s,a)*w_i
+            q += features[feat] * self.getWeights()[feat] # formula summed over
+        return q
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        features = self.featExtractor.getFeatures(state,action)
+        difference = reward + self.discount * self.computeValueFromQValues(nextState) - self.getQValue(state,action) # seperate because it doesn't work otherwise :///
+        for feat in features:
+            self.weights[feat] += self.alpha * difference * features[feat] # w_i + alfa * difference * f_i(s,a)
 
     def final(self, state):
         "Called at the end of each game."

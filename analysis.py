@@ -22,49 +22,52 @@
 def question2():
     answerDiscount = 0.9
     answerNoise = 0
-    # if there is no noise, then since future rewards are barely discounted the agent will cross the brinde
+    # if there is no noise, then since future rewards are barely discounted the agent will cross the bridge
     return answerDiscount, answerNoise
+
+# ----------------------------------------------------------------------------------------------------------------------
+# these values were eyeballed and weren't outright calculated
 
 def question3a():
     answerDiscount = 0.1 # heavily discount distant rewards -> not worth taking
-    answerNoise = 0
-    answerLivingReward = -1
+    answerNoise = 0 # remove noise to make risking cliff feasable
+    answerLivingReward = -1 # make the agent want to stop at an end-state
     return answerDiscount, answerNoise, answerLivingReward
-    # If not possible, return 'NOT POSSIBLE'
+
 
 def question3b():
     answerDiscount = 0.5
     answerNoise = 0.4 # add noise to make falling of cliff a larger possibility
-    answerLivingReward = -1
+    answerLivingReward = -1 # make the agent want to stop at an end-state
     return answerDiscount, answerNoise, answerLivingReward
-    # If not possible, return 'NOT POSSIBLE'
+
 
 def question3c():
     answerDiscount = 0.9 # distant rewards are barely discounted
     answerNoise = 0  # no risk of falling off cliff
-    answerLivingReward = -1
+    answerLivingReward = -1 # make the agent want to stop at an end-state
     return answerDiscount, answerNoise, answerLivingReward
     # If not possible, return 'NOT POSSIBLE'
 
 def question3d():
-    answerDiscount = 0.9
-    answerNoise = 0.4
-    answerLivingReward = -1
+    answerDiscount = 0.9 # distant rewards are more attractive
+    answerNoise = 0.4 # cliff is too risky because of noise
+    answerLivingReward = -1 # make the agent want to stop at an end-state
     return answerDiscount, answerNoise, answerLivingReward
-    # If not possible, return 'NOT POSSIBLE'
+
 
 def question3e():
-    answerDiscount = 0.5
-    answerNoise = 0.4
+    answerDiscount = 0.5 # eyeballed this
+    answerNoise = 0.4 # eyeballed this as well
     answerLivingReward = 5 # make ending extremely unattractive
     return answerDiscount, answerNoise, answerLivingReward
-    # If not possible, return 'NOT POSSIBLE'
+
 
 def question6():
-    answerEpsilon = 0
-    answerLearningRate = 0.1
+    # answerEpsilon = 0
+    # answerLearningRate = 0.1
     return 'NOT POSSIBLE'
-    # If not possible, return 'NOT POSSIBLE'
+
 
 if __name__ == '__main__':
     print 'Answers to analysis questions:'
