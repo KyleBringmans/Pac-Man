@@ -6,7 +6,7 @@
 ─▒▒▒▒▒▒▒──█████▄──────                             
 ─▒─▒─▒─▒───▀████▀─────                             
 
-Voor het Honoursprogramma (2018)
+Honoursprogramma (2018)
 
 Fun commands:
 
@@ -21,3 +21,9 @@ python crawler.py
 python pacman.py -p PacmanQAgent -x 2000 -n 2010 -l smallGrid 
 
 python pacman.py -p PacmanQAgent -n 10 -l smallGrid -a numTraining=10
+
+python pacman.py -p ApproximateQAgent -x 2000 -n 2010 -l smallGrid 
+
+python pacman.py -p ApproximateQAgent -a extractor=SimpleExtractor -x 50 -n 60 -l mediumGrid
+
+python pacman.py -p ApproximateQAgent -a extractor=SimpleExtractor -x 50 -n 60 -l mediumClassic 
