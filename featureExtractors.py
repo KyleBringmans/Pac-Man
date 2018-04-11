@@ -16,6 +16,7 @@
 
 from game import Directions, Actions
 import util
+import math
 
 class FeatureExtractor:
     def getFeatures(self, state, action):
@@ -72,23 +73,39 @@ class SimpleExtractor(FeatureExtractor):
     - whether a ghost is one step away
     """
 
+    # TODO EDIT
     def getFeatures(self, state, action):
         # extract the grid of food and wall locations and get the ghost locations
         food = state.getFood()
         walls = state.getWalls()
         ghosts = state.getGhostPositions()
+        ghostStates = state.getGhostStates()
+        sTime = state.getScaredTime()
 
         features = util.Counter()
 
+        features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
         features["bias"] = 1.0
 
         # compute the location of pacman after he takes the action
         x, y = state.getPacmanPosition()
         dx, dy = Actions.directionToVector(action)
         next_x, next_y = int(x + dx), int(y + dy)
+        # TODO EDIT
+        n = 0 #distance instead of 1
 
         # count the number of ghosts 1-step away
-        features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+        # TODO EDIT
+        # features["#-of-scared-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+        # features["#-of-scared-ghosts-1-step-away"] = sum(self.euclDist(x,y,g[0],g[1]) < n for g in ghosts)
+
+        # 5 instead of 1 because otherwise pac-man will chase dangerous ghosts that will change back soon
+        notScared = list(filter(lambda x: x[1].scaredTimer < 5,zip(ghosts, ghostStates)))
+        features["#-of-ghosts-1-step-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
+
+        features["#-of-ghosts-scared-1-step-away"] = len(ghosts) - len(notScared)
+
+        #print(features["#-of-scared-ghosts-1-step-away"])
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
@@ -101,3 +118,16 @@ class SimpleExtractor(FeatureExtractor):
             features["closest-food"] = float(dist) / (walls.width * walls.height)
         features.divideAll(10.0)
         return features
+
+    # TODO EDIT
+    def avgScaredTime(self,states):
+        tot = 0
+        for i in range(len(states)):
+           tot += states[i].scaredTimer
+        a = tot/len(states)
+        return a
+
+    def euclDist(self,x1,y1,x2,y2):
+        return math.sqrt(((x1-x2)**2) + ((y1-y2)**2))
+
+    # TODO: implement A* to find shortest distance to ghosts instead of euclidic distance

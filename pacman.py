@@ -71,6 +71,9 @@ class GameState:
     # Accessor methods: use these to access state data #
     ####################################################
 
+    def getScaredTime(self):
+        return SCARED_TIME
+
     # static variable keeps track of which states have had getLegalActions called
     explored = set()
     def getAndResetExplored():
@@ -488,8 +491,10 @@ def readCommand( argv ):
     """
     parser = OptionParser(usageStr)
 
+    # -------------------------------------------------------------------------------------------------
     parser.add_option('-n', '--numGames', dest='numGames', type='int',
                       help=default('the number of GAMES to play'), metavar='GAMES', default=1)
+    #-------------------------------------------------------------------------------------------------
     parser.add_option('-l', '--layout', dest='layout',
                       help=default('the LAYOUT_FILE from which to load the map layout'),
                       metavar='LAYOUT_FILE', default='mediumClassic')
@@ -515,8 +520,10 @@ def readCommand( argv ):
                       help='A recorded game file (pickle) to replay', default=None)
     parser.add_option('-a','--agentArgs',dest='agentArgs',
                       help='Comma separated values sent to agent. e.g. "opt1=val1,opt2,opt3=val3"')
+    # -------------------------------------------------------------------------------------------------
     parser.add_option('-x', '--numTraining', dest='numTraining', type='int',
                       help=default('How many episodes are training (suppresses output)'), default=0)
+    # -------------------------------------------------------------------------------------------------
     parser.add_option('--frameTime', dest='frameTime', type='float',
                       help=default('Time to delay between frames; <0 means keyboard'), default=0.1)
     parser.add_option('-c', '--catchExceptions', action='store_true', dest='catchExceptions',

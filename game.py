@@ -484,6 +484,7 @@ class GameStateData:
             return '3'
         return 'E'
 
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     def initialize( self, layout, numGhostAgents ):
         """
         Creates an initial game state from a layout array (see layout.py).
@@ -501,7 +502,7 @@ class GameStateData:
             if not isPacman:
                 if numGhosts == numGhostAgents: continue # Max ghosts reached already
                 else: numGhosts += 1
-            self.agentStates.append( AgentState( Configuration( pos, Directions.STOP), isPacman) )
+            self.agentStates.append( AgentState( Configuration( pos, Directions.STOP), isPacman) ) #?
         self._eaten = [False for a in self.agentStates]
 
 try:
