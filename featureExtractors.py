@@ -82,6 +82,10 @@ class SimpleExtractor(FeatureExtractor):
         ghostStates = state.getGhostStates()
         sTime = state.getScaredTime()
 
+        a = self.shortestPath(1,1,4,8,walls)
+        #a = self.getNeighboursSimple(2,5,walls)
+        #a = self.notWall(0,0,walls)
+
         features = util.Counter()
 
         features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
@@ -133,36 +137,57 @@ class SimpleExtractor(FeatureExtractor):
         q.push([start_x,start_y,0],0)
         while not q.isEmpty():
             lx,ly,cost = q.pop()
+            print(lx,ly)
             if (dest_x,dest_y) == (lx,ly):
+                print("done")
                 return cost
             if (lx,ly) not in visited:
                 visited.add((lx,ly))
-                for (x,y) in self.getNeighbours(lx,ly,walls):
+                for (x,y) in self.getNeighboursSimple(lx,ly,walls):
                     if (x,y) not in visited:
                         backwardCost = 1 + cost
-                        forwardCost = self.euclDist(start_x,start_y,x,y)
+                        forwardCost = self.euclDist(x,y,dest_x,dest_y)
                         fx = backwardCost + forwardCost
                         q.push([x,y,backwardCost],fx)
 
-    def getNeighbours(self,x,y,walls):
+    def notWall(self,x,y,walls):
+        w = walls[y] # 'not' becuase walls = true
+        return not w[len(w) - 1 - x]
+
+    def inHallway(self,x,y,origin,walls):
+        nbrs = self.getNeighboursSimple(x,y,walls)
+        # don't count doubles (spots counted in previous iteration
+        nbrs = filter(lambda q: q != origin, nbrs)
+        #check if there are at least 2 nbrs -> hallway
+        if len(nbrs) == 2 and self.euclDist(nbrs[0][0],nbrs[0][1],nbrs[1][0],nbrs[1][1]) == 2:
+            fst = nbrs[0]
+            snd = nbrs[1]
+            return 1 + self.inHallway(fst[0], fst[1], (x,y), walls) + self.inHallway(snd[0], snd[1], (x,y), walls)
+        elif len(nbrs) == 1:
+            fst = nbrs[0]
+            return 1 + self.inHallway(fst[0], fst[1], (x,y), walls)
+        elif len(nbrs) == 0:
+            return 1
+        else:
+            return 0
+
+    def getNeighboursSimple(self,x,y,walls):
         width = walls.width
         height = walls.height
-        nbrs = self.generateAllNeighbours(x,y)
-        nbrs = filter(lambda q: q[0] < width >= 0 and q[1] < height >= 0, nbrs) # keep nbrs in grid
-        nbrs = filter(lambda q: self.notWall(q,walls),nbrs) # remove neighbours that aren't walls
+        nbrs = self.generateAllNeighboursSimple(x,y)
+        nbrs = filter(lambda q: q[1] < width >= 0 and q[0] < height >= 0, nbrs) # keep nbrs in grid
+        nbrs = filter(lambda q: self.notWall(q[0],q[1],walls),nbrs) # remove neighbours that aren't walls
         return nbrs
 
-    def generateAllNeighbours(self,x,y):
-        l = [-1,0,1]
+    def generateAllNeighboursSimple(self,x,y):
+        l = [-1, 0, 1]
         toReturn = []
-        for i in range(0,3):
-            for j in range(0,3):
-                toReturn.append((x+l[i],y+l[j]))
-        toReturn.remove((x,y))
-        return toReturn
+        for i in range(0, 3):
+            for j in range(0, 3):
+                toReturn.append((x + l[i], y + l[j]))
+        toReturn.remove((x, y))
+        return filter(lambda q: self.euclDist(q[0],q[1],x,y) == 1, toReturn)
 
-    def notWall(self,pos,walls):
-        return not walls[pos[1]][pos[0]] # 'not' becuase walls = true
 
 
     # TODO: neighbours
