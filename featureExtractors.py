@@ -91,12 +91,11 @@ class SimpleExtractor(FeatureExtractor):
         x, y = state.getPacmanPosition()
         dx, dy = Actions.directionToVector(action)
         next_x, next_y = int(x + dx), int(y + dy)
-        # TODO EDIT
-        n = 0 #distance instead of 1
 
         # count the number of ghosts 1-step away
         # TODO EDIT
         # features["#-of-scared-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+        n = 0  # distance instead of 1
         # features["#-of-scared-ghosts-1-step-away"] = sum(self.euclDist(x,y,g[0],g[1]) < n for g in ghosts)
 
         # 5 instead of 1 because otherwise pac-man will chase dangerous ghosts that will change back soon
@@ -104,8 +103,6 @@ class SimpleExtractor(FeatureExtractor):
         features["#-of-ghosts-1-step-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
 
         features["#-of-ghosts-scared-1-step-away"] = len(ghosts) - len(notScared)
-
-        #print(features["#-of-scared-ghosts-1-step-away"])
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
@@ -130,4 +127,44 @@ class SimpleExtractor(FeatureExtractor):
     def euclDist(self,x1,y1,x2,y2):
         return math.sqrt(((x1-x2)**2) + ((y1-y2)**2))
 
-    # TODO: implement A* to find shortest distance to ghosts instead of euclidic distance
+    def shortestPath(self,start_x,start_y,dest_x,dest_y,walls): # A* algorithm
+        visited = set()
+        q = util.PriorityQueue()
+        q.push([start_x,start_y,0],0)
+        while not q.isEmpty():
+            lx,ly,cost = q.pop()
+            if (dest_x,dest_y) == (lx,ly):
+                return cost
+            if (lx,ly) not in visited:
+                visited.add((lx,ly))
+                for (x,y) in self.getNeighbours(lx,ly,walls):
+                    if (x,y) not in visited:
+                        backwardCost = 1 + cost
+                        forwardCost = self.euclDist(start_x,start_y,x,y)
+                        fx = backwardCost + forwardCost
+                        q.push([x,y,backwardCost],fx)
+
+    def getNeighbours(self,x,y,walls):
+        width = walls.width
+        height = walls.height
+        nbrs = self.generateAllNeighbours(x,y)
+        nbrs = filter(lambda q: q[0] < width >= 0 and q[1] < height >= 0, nbrs) # keep nbrs in grid
+        nbrs = filter(lambda q: self.notWall(q,walls),nbrs) # remove neighbours that aren't walls
+        return nbrs
+
+    def generateAllNeighbours(self,x,y):
+        l = [-1,0,1]
+        toReturn = []
+        for i in range(0,3):
+            for j in range(0,3):
+                toReturn.append((x+l[i],y+l[j]))
+        toReturn.remove((x,y))
+        return toReturn
+
+    def notWall(self,pos,walls):
+        return not walls[pos[1]][pos[0]] # 'not' becuase walls = true
+
+
+    # TODO: neighbours
+    # Util.PriorityQueue() for P-Queue
+    # TODO: A*
