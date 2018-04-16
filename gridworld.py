@@ -91,6 +91,7 @@ class Gridworld(mdp.MarkovDecisionProcess):
         cell = self.grid[x][y]
         if type(cell) == int or type(cell) == float:
             return cell
+
         return self.livingReward
 
     def getStartState(self):

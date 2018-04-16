@@ -183,6 +183,7 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         features = self.featExtractor.getFeatures(state,action)
+
         q = 0
         for feat in features:   # Q(s,a) = Sum: i -> n : f_i(s,a)*w_i
             q += features[feat] * self.getWeights()[feat] # formula summed over
@@ -197,6 +198,8 @@ class ApproximateQAgent(PacmanQAgent):
         difference = reward + self.discount * self.computeValueFromQValues(nextState) - self.getQValue(state,action) # seperate because it doesn't work otherwise :///
         for feat in features:
             self.weights[feat] += self.alpha * difference * features[feat] # w_i + alfa * difference * f_i(s,a)
+
+        #print(self.weights)
 
     def final(self, state):
         "Called at the end of each game."

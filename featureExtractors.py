@@ -16,6 +16,7 @@
 
 from game import Directions, Actions
 import util
+import math
 
 class FeatureExtractor:
     def getFeatures(self, state, action):
@@ -77,10 +78,21 @@ class SimpleExtractor(FeatureExtractor):
         food = state.getFood()
         walls = state.getWalls()
         ghosts = state.getGhostPositions()
+        ghostStates = state.getGhostStates()
+        sTime = state.getScaredTime()
+        n = 0  # distance instead of 1
+        #a = self.calculateCorners([(1,1)] + self.shortestPath(1,1,4,8,walls),walls)
+        #a = self.getNeighboursSimple(2,5,walls)
+        #a = self.notWall(0,0,walls)
 
         features = util.Counter()
 
+        features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
         features["bias"] = 1.0
+        #inputList = zip(ghosts,[state.getPacmanPosition[1]]*len(ghosts),state.getPacmanPosition[0])
+        #ghostDistances = map(lambda q: self.shortestPath(q[0]),inputList)
+        #features["#-of-ghosts-n-steps-away"] = filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0],q[1],q[3],q[4],walls)))
+
 
         # compute the location of pacman after he takes the action
         x, y = state.getPacmanPosition()
@@ -88,7 +100,22 @@ class SimpleExtractor(FeatureExtractor):
         next_x, next_y = int(x + dx), int(y + dy)
 
         # count the number of ghosts 1-step away
-        features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+
+        # --------------------------------------------------------------------------------------------------------------
+
+        features["#-of-scared-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+
+        # features["#-of-scared-ghosts-1-step-away"] = sum(self.euclDist(x,y,g[0],g[1]) < n for g in ghosts)
+
+        # 5 instead of 1 because otherwise pac-man will chase dangerous ghosts that will change back soon
+        #notScared = list(filter(lambda x: x[1].scaredTimer < 5,zip(ghosts, ghostStates)))
+        #features["#-of-ghosts-1-step-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
+
+        # --------------------------------------------------------------------------------------------------------------
+
+        #features["#-of-ghosts-scared-1-step-away"] = len(ghosts) - len(notScared)
+
+        # --------------------------------------------------------------------------------------------------------------
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
@@ -101,3 +128,117 @@ class SimpleExtractor(FeatureExtractor):
             features["closest-food"] = float(dist) / (walls.width * walls.height)
         features.divideAll(10.0)
         return features
+
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def avgScaredTime(self,states):
+        tot = 0
+        for i in range(len(states)):
+           tot += states[i].scaredTimer
+        a = tot/len(states)
+        return a
+
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def inHallway(self,x,y,origin,walls):
+        nbrs = self.getNeighboursSimple(x,y,walls)
+        # don't count doubles (spots counted in previous iteration
+        nbrs = filter(lambda q: q != origin, nbrs)
+        # check if there are the correct # of nbr walls -> hallway
+        if len(nbrs) == 2 and self.euclDist(nbrs[0][0],nbrs[0][1],nbrs[1][0],nbrs[1][1]) == 2:
+            fst = nbrs[0]
+            snd = nbrs[1]
+            return 1 + self.inHallway(fst[0], fst[1], (x,y), walls) + self.inHallway(snd[0], snd[1], (x,y), walls)
+        elif len(nbrs) == 1:
+            fst = nbrs[0]
+            return 1 + self.inHallway(fst[0], fst[1], (x,y), walls)
+        elif len(nbrs) == 0:
+            return 1
+        else:
+            return 0
+
+    def euclDist(self,x1,y1,x2,y2):
+        return math.sqrt(((x1-x2)**2) + ((y1-y2)**2))
+
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def shortestPath(self,start_x,start_y,dest_x,dest_y,walls): # A* algorithm
+        visited = set()
+        q = util.PriorityQueue()
+        q.push([(start_x,start_y),[],0],0)
+        while not q.isEmpty():
+            loc,path,cost = q.pop()
+            print(loc)
+            if (dest_x,dest_y) == loc:
+                print("done")
+                return path
+            if loc not in visited:
+                visited.add(loc)
+                for (x,y) in self.getNeighboursSimple(loc[0],loc[1],walls):
+                    if (x,y) not in visited:
+                        backwardCost = 1 + cost
+                        forwardCost = self.euclDist(x,y,dest_x,dest_y)
+                        fx = backwardCost + forwardCost
+                        q.push([(x,y),path + [(x,y)],backwardCost],fx)
+
+    def notWall(self,x,y,walls):
+        w = walls[y] # 'not' becuase walls = true
+        return not w[len(w) - 1 - x]
+
+
+
+    def getNeighboursSimple(self,x,y,walls):
+        width = walls.width
+        height = walls.height
+        nbrs = self.generateAllNeighboursSimple(x,y)
+        nbrs = filter(lambda q: q[1] < width >= 0 and q[0] < height >= 0, nbrs) # keep nbrs in grid
+        nbrs = filter(lambda q: self.notWall(q[0],q[1],walls),nbrs) # remove neighbours that aren't walls
+        return nbrs
+
+    def getAllNeighboursSimple(self,x,y,walls):
+        width = walls.width
+        height = walls.height
+        nbrs = self.generateAllNeighboursSimple(x, y)
+        nbrs = filter(lambda q: q[1] < width >= 0 and q[0] < height >= 0, nbrs)  # keep nbrs in grid
+        return nbrs
+
+    def generateAllNeighboursSimple(self,x,y):
+        l = [-1, 0, 1]
+        toReturn = []
+        for i in range(0, 3):
+            for j in range(0, 3):
+                toReturn.append((x + l[i], y + l[j]))
+        toReturn.remove((x, y))
+        return filter(lambda q: self.euclDist(q[0],q[1],x,y) == 1, toReturn)
+
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def calculateCorners(self,path,walls):
+        corners = 0
+        if len(path) < 3:
+            return 0
+        for i in range(0,len(path)-2):
+            bCorner = path[i]
+            corner = path[i+1]
+            aCorner = path[i+2]
+            if self.euclDist(bCorner[0],bCorner[1],aCorner[0],aCorner[1]) == math.sqrt(2):
+                if self.isCorner([bCorner,corner,aCorner],walls):
+                    corners += 1
+        return corners
+
+        # TODO ehhhh is this correct?
+
+    def isCorner(self, corner, walls):
+        if self.wallNeighbours(corner[0], walls) > 0 and self.wallNeighbours(corner[2], walls) > 0:
+            return True
+        else:
+            return False
+
+    def wallNeighbours(self,pos,walls):
+        nbrs = self.getAllNeighboursSimple(pos[0],pos[1],walls)
+        w = 0
+        for p in nbrs:
+            if not self.notWall(p[0],p[1],walls): # so if it is a wall
+                w += 1
+        return w
+
