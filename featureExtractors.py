@@ -65,6 +65,7 @@ def closestFood(pos, food, walls):
     return None
 
 class SimpleExtractor(FeatureExtractor):
+    
     """
     Returns simple features for a basic reflex Pacman:
     - whether food will be eaten
@@ -80,45 +81,48 @@ class SimpleExtractor(FeatureExtractor):
         ghosts = state.getGhostPositions()
         ghostStates = state.getGhostStates()
         sTime = state.getScaredTime()
-        n = 0  # distance instead of 1
+        n = 3  # distance instead of 1
         #a = self.calculateCorners([(1,1)] + self.shortestPath(1,1,4,8,walls),walls)
         #a = self.getNeighboursSimple(2,5,walls)
         #a = self.notWall(0,0,walls)
 
         features = util.Counter()
 
-        features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
-        features["bias"] = 1.0
-        #inputList = zip(ghosts,[state.getPacmanPosition[1]]*len(ghosts),state.getPacmanPosition[0])
-        #ghostDistances = map(lambda q: self.shortestPath(q[0]),inputList)
-        #features["#-of-ghosts-n-steps-away"] = filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0],q[1],q[3],q[4],walls)))
-
-
         # compute the location of pacman after he takes the action
         x, y = state.getPacmanPosition()
         dx, dy = Actions.directionToVector(action)
         next_x, next_y = int(x + dx), int(y + dy)
 
+        features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
+        features["bias"] = 1.0
+        inputList = zip(ghosts,[(x,y)]*len(ghosts))
+        #ghostDistances = map(lambda q: self.shortestPath(q[0]),inputList)
+        features["#-of-ghosts-n-steps-away"] = len(filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0][0],q[0][1],q[1][0],q[1][1],walls),inputList)))
+
+
+
+
         # count the number of ghosts 1-step away
 
         # --------------------------------------------------------------------------------------------------------------
 
-        features["#-of-scared-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+        #features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
 
-        # features["#-of-scared-ghosts-1-step-away"] = sum(self.euclDist(x,y,g[0],g[1]) < n for g in ghosts)
+
 
         # 5 instead of 1 because otherwise pac-man will chase dangerous ghosts that will change back soon
-        #notScared = list(filter(lambda x: x[1].scaredTimer < 5,zip(ghosts, ghostStates)))
-        #features["#-of-ghosts-1-step-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
+        #notScared = list(filter(lambda q: q[1].scaredTimer == 0,zip(ghosts, ghostStates)))
+        #features["#-of-not-scared-ghosts-n-steps-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) < n for g in notScared)
+        #features["#-of-ghosts-n-steps-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
 
         # --------------------------------------------------------------------------------------------------------------
 
-        #features["#-of-ghosts-scared-1-step-away"] = len(ghosts) - len(notScared)
+        #features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x,y,q[0],q[1]) < n,ghosts)) - len(notScared)
 
         # --------------------------------------------------------------------------------------------------------------
 
         # if there is no danger of ghosts then add the food feature
-        if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
+        if not features["#-of-ghosts-n-steps-away"] and food[next_x][next_y]:
             features["eats-food"] = 1.0
 
         dist = closestFood((next_x, next_y), food, walls)
@@ -127,6 +131,7 @@ class SimpleExtractor(FeatureExtractor):
             # will diverge wildly
             features["closest-food"] = float(dist) / (walls.width * walls.height)
         features.divideAll(10.0)
+
         return features
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -168,9 +173,8 @@ class SimpleExtractor(FeatureExtractor):
         q.push([(start_x,start_y),[],0],0)
         while not q.isEmpty():
             loc,path,cost = q.pop()
-            print(loc)
             if (dest_x,dest_y) == loc:
-                print("done")
+                #print(path)
                 return path
             if loc not in visited:
                 visited.add(loc)
@@ -182,7 +186,12 @@ class SimpleExtractor(FeatureExtractor):
                         q.push([(x,y),path + [(x,y)],backwardCost],fx)
 
     def notWall(self,x,y,walls):
-        w = walls[y] # 'not' becuase walls = true
+        #print(y)
+        #print(int(y))
+        #print(walls)
+        y = int(y)
+        w = walls[y]  # 'not' becuase walls = true
+        x = int(x)
         return not w[len(w) - 1 - x]
 
 
