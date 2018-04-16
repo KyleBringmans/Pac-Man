@@ -73,7 +73,6 @@ class SimpleExtractor(FeatureExtractor):
     - whether a ghost is one step away
     """
 
-    # TODO EDIT
     def getFeatures(self, state, action):
         # extract the grid of food and wall locations and get the ghost locations
         food = state.getFood()
@@ -81,8 +80,8 @@ class SimpleExtractor(FeatureExtractor):
         ghosts = state.getGhostPositions()
         ghostStates = state.getGhostStates()
         sTime = state.getScaredTime()
-
-        a = self.calculateCorners([(1,1)] + self.shortestPath(1,1,4,8,walls),walls)
+        n = 0  # distance instead of 1
+        #a = self.calculateCorners([(1,1)] + self.shortestPath(1,1,4,8,walls),walls)
         #a = self.getNeighboursSimple(2,5,walls)
         #a = self.notWall(0,0,walls)
 
@@ -90,6 +89,10 @@ class SimpleExtractor(FeatureExtractor):
 
         features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
         features["bias"] = 1.0
+        #inputList = zip(ghosts,[state.getPacmanPosition[1]]*len(ghosts),state.getPacmanPosition[0])
+        #ghostDistances = map(lambda q: self.shortestPath(q[0]),inputList)
+        #features["#-of-ghosts-n-steps-away"] = filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0],q[1],q[3],q[4],walls)))
+
 
         # compute the location of pacman after he takes the action
         x, y = state.getPacmanPosition()
@@ -100,18 +103,19 @@ class SimpleExtractor(FeatureExtractor):
 
         # --------------------------------------------------------------------------------------------------------------
 
-        # TODO EDIT
-        # features["#-of-scared-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
-        n = 0  # distance instead of 1
+        features["#-of-scared-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+
         # features["#-of-scared-ghosts-1-step-away"] = sum(self.euclDist(x,y,g[0],g[1]) < n for g in ghosts)
 
         # 5 instead of 1 because otherwise pac-man will chase dangerous ghosts that will change back soon
-        notScared = list(filter(lambda x: x[1].scaredTimer < 5,zip(ghosts, ghostStates)))
-        features["#-of-ghosts-1-step-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
+        #notScared = list(filter(lambda x: x[1].scaredTimer < 5,zip(ghosts, ghostStates)))
+        #features["#-of-ghosts-1-step-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
 
         # --------------------------------------------------------------------------------------------------------------
 
-        features["#-of-ghosts-scared-1-step-away"] = len(ghosts) - len(notScared)
+        #features["#-of-ghosts-scared-1-step-away"] = len(ghosts) - len(notScared)
+
+        # --------------------------------------------------------------------------------------------------------------
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
@@ -127,7 +131,6 @@ class SimpleExtractor(FeatureExtractor):
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    # TODO EDIT
     def avgScaredTime(self,states):
         tot = 0
         for i in range(len(states)):
@@ -210,7 +213,6 @@ class SimpleExtractor(FeatureExtractor):
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    # TODO: reduce amount of turns took
     def calculateCorners(self,path,walls):
         corners = 0
         if len(path) < 3:
