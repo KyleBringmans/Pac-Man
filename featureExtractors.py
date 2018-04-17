@@ -65,7 +65,7 @@ def closestFood(pos, food, walls):
     return None
 
 class SimpleExtractor(FeatureExtractor):
-    
+
     """
     Returns simple features for a basic reflex Pacman:
     - whether food will be eaten
@@ -73,7 +73,7 @@ class SimpleExtractor(FeatureExtractor):
     - whether a ghost collision is imminent
     - whether a ghost is one step away
     """
-
+    # TODO add class-variable to be assigned to the matrix of shortest paths
     def getFeatures(self, state, action):
         # extract the grid of food and wall locations and get the ghost locations
         food = state.getFood()
@@ -82,11 +82,8 @@ class SimpleExtractor(FeatureExtractor):
         ghostStates = state.getGhostStates()
         sTime = state.getScaredTime()
         n = 3  # distance instead of 1
-        #a = self.calculateCorners([(1,1)] + self.shortestPath(1,1,4,8,walls),walls)
-        #a = self.getNeighboursSimple(2,5,walls)
-        #a = self.notWall(0,0,walls)
-
         features = util.Counter()
+
 
         # compute the location of pacman after he takes the action
         x, y = state.getPacmanPosition()
@@ -95,42 +92,54 @@ class SimpleExtractor(FeatureExtractor):
 
         features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
         features["bias"] = 1.0
-        inputList = zip(ghosts,[(x,y)]*len(ghosts))
+        #inputList = zip(ghosts,[(x,y)]*len(ghosts))
         #ghostDistances = map(lambda q: self.shortestPath(q[0]),inputList)
-        features["#-of-ghosts-n-steps-away"] = len(filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0][0],q[0][1],q[1][0],q[1][1],walls),inputList)))
-
-
-
-
-        # count the number of ghosts 1-step away
 
         # --------------------------------------------------------------------------------------------------------------
 
-        #features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
-
-
-
-        # 5 instead of 1 because otherwise pac-man will chase dangerous ghosts that will change back soon
-        #notScared = list(filter(lambda q: q[1].scaredTimer == 0,zip(ghosts, ghostStates)))
-        #features["#-of-not-scared-ghosts-n-steps-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) < n for g in notScared)
+        #features["#-of-ghosts-n-steps-away"] = len(filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0][0],q[0][1],q[1][0],q[1][1],walls),inputList)))
+        features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
+        notScared = list(filter(lambda q: q[1].scaredTimer == 0,zip(ghosts, ghostStates)))
+        features["#-of-not-scared-ghosts-n-steps-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) < n for g in notScared)
         #features["#-of-ghosts-n-steps-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
 
         # --------------------------------------------------------------------------------------------------------------
 
-        #features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x,y,q[0],q[1]) < n,ghosts)) - len(notScared)
+        features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x,y,q[0],q[1]) < n,ghosts)) - len(notScared)
 
         # --------------------------------------------------------------------------------------------------------------
 
         # if there is no danger of ghosts then add the food feature
-        if not features["#-of-ghosts-n-steps-away"] and food[next_x][next_y]:
+        if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
             features["eats-food"] = 1.0
 
-        dist = closestFood((next_x, next_y), food, walls)
-        if dist is not None:
+
+        capsules = map(lambda q: [False]*len(q),food)
+        for cap in state.getCapsules():
+            capsules[cap[0]][cap[1]] = True
+
+        distFood = closestFood((next_x, next_y), food, walls)
+        distCapsule = closestFood((next_x, next_y), capsules, walls)
+        if distFood is not None:
             # make the distance a number less than one otherwise the update
             # will diverge wildly
-            features["closest-food"] = float(dist) / (walls.width * walls.height)
+            features["closest-food"] = float(distFood) / (walls.width * walls.height)
+        if distCapsule is not None:
+            features["closest-capsule"] = float(distCapsule) / (walls.width * walls.height)
+
+
+
+        surface = walls.height*walls.width*1.0
+        features["hallway-0"] = (self.inHallwayRec(x+1,y,(x,y),walls) if self.notWall(x+1,y,walls) else 0)/surface
+        features["hallway-1"] = (self.inHallwayRec(x,y+1,(x,y),walls) if self.notWall(x,y+1,walls) else 0)/surface
+        features["hallway-2"] = (self.inHallwayRec(x-1,y,(x,y),walls) if self.notWall(x-1,y,walls) else 0)/surface
+        features["hallway-3"] = (self.inHallwayRec(x,y-1,(x,y),walls) if self.notWall(x,y-1,walls) else 0)/surface
+
+
+
+
         features.divideAll(10.0)
+
 
         return features
 
@@ -145,22 +154,40 @@ class SimpleExtractor(FeatureExtractor):
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def inHallway(self,x,y,origin,walls):
-        nbrs = self.getNeighboursSimple(x,y,walls)
+    def inHallway(self, x, y, origin, walls):
+        nbrs = self.getNeighboursSimple(x, y, walls)
         # don't count doubles (spots counted in previous iteration
         nbrs = filter(lambda q: q != origin, nbrs)
         # check if there are the correct # of nbr walls -> hallway
-        if len(nbrs) == 2 and self.euclDist(nbrs[0][0],nbrs[0][1],nbrs[1][0],nbrs[1][1]) == 2:
+        if len(nbrs) == 2:
             fst = nbrs[0]
             snd = nbrs[1]
-            return 1 + self.inHallway(fst[0], fst[1], (x,y), walls) + self.inHallway(snd[0], snd[1], (x,y), walls)
+            a = 1 + self.inHallwayRec(fst[0], fst[1], (x, y), walls)
+            b = self.inHallwayRec(snd[0], snd[1], (x, y), walls)
+            return a + b
         elif len(nbrs) == 1:
             fst = nbrs[0]
-            return 1 + self.inHallway(fst[0], fst[1], (x,y), walls)
+            return 1 + self.inHallwayRec(fst[0], fst[1], (x, y), walls)
         elif len(nbrs) == 0:
             return 1
         else:
             return 0
+
+    def inHallwayRec(self,x,y,origin,walls):
+        nbrs = self.getNeighboursSimple(x,y,walls)
+        # don't count doubles (spots counted in previous iteration)
+        nbrs = filter(lambda q: q != origin, nbrs)
+        # check if there are the correct # of nbr walls -> hallway
+        if len(nbrs) == 1:
+            fst = nbrs[0]
+            return 1 + self.inHallwayRec(fst[0], fst[1], (x,y), walls)
+        elif len(nbrs) == 0:
+            return 1
+        else:
+            return 0
+
+    def getDirectionalNeighbour(self,x,y,direction):
+        return x + direction[0], y + direction[1]
 
     def euclDist(self,x1,y1,x2,y2):
         return math.sqrt(((x1-x2)**2) + ((y1-y2)**2))
@@ -174,7 +201,6 @@ class SimpleExtractor(FeatureExtractor):
         while not q.isEmpty():
             loc,path,cost = q.pop()
             if (dest_x,dest_y) == loc:
-                #print(path)
                 return path
             if loc not in visited:
                 visited.add(loc)
@@ -186,11 +212,8 @@ class SimpleExtractor(FeatureExtractor):
                         q.push([(x,y),path + [(x,y)],backwardCost],fx)
 
     def notWall(self,x,y,walls):
-        #print(y)
-        #print(int(y))
-        #print(walls)
         y = int(y)
-        w = walls[y]  # 'not' becuase walls = true
+        w = walls[y]
         x = int(x)
         return not w[len(w) - 1 - x]
 
@@ -212,13 +235,7 @@ class SimpleExtractor(FeatureExtractor):
         return nbrs
 
     def generateAllNeighboursSimple(self,x,y):
-        l = [-1, 0, 1]
-        toReturn = []
-        for i in range(0, 3):
-            for j in range(0, 3):
-                toReturn.append((x + l[i], y + l[j]))
-        toReturn.remove((x, y))
-        return filter(lambda q: self.euclDist(q[0],q[1],x,y) == 1, toReturn)
+        return [(x+1,y),(x,y+1),(x-1,y),(x,y-1)]
 
     # ------------------------------------------------------------------------------------------------------------------
 

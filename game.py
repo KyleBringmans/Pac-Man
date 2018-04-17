@@ -572,9 +572,13 @@ class Game:
         self.display.initialize(self.state.data)
         self.numMoves = 0
 
+        # EDITTED
+        temporaryVar = self.state.data.food
+        # TODO calculate shortest distances to every position with A*
         ###self.display.initialize(self.state.makeObservation(1).data)
         # inform learning agents of the game start
         for i in range(len(self.agents)):
+            # TODO add matrix to every agents properties
             agent = self.agents[i]
             if not agent:
                 self.mute(i)

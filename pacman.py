@@ -376,6 +376,7 @@ class PacmanRules:
         if( position in state.getCapsules() ):
             state.data.capsules.remove( position )
             state.data._capsuleEaten = position
+            state.data.scoreChange += 50
             # Reset all ghosts' scared timers
             for index in range( 1, len( state.data.agentStates ) ):
                 state.data.agentStates[index].scaredTimer = SCARED_TIME
@@ -640,6 +641,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
     games = []
 
     for i in range( numGames ):
+        print(i)
         beQuiet = i < numTraining
         if beQuiet:
                 # Suppress output and graphics
@@ -660,6 +662,10 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             components = {'layout': layout, 'actions': game.moveHistory}
             cPickle.dump(components, f)
             f.close()
+
+    # EDITTED
+    print(pacman.getWeights())
+    # EDITTED
 
     if (numGames-numTraining) > 0:
         scores = [game.state.getScore() for game in games]
