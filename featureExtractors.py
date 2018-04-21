@@ -130,10 +130,10 @@ class SimpleExtractor(FeatureExtractor):
 
 
         surface = walls.height*walls.width*1.0
-        features["hallway-0"] = (self.inHallwayRec(x+1,y,(x,y),walls) if self.notWall(x+1,y,walls) else 0)/surface
-        features["hallway-1"] = (self.inHallwayRec(x,y+1,(x,y),walls) if self.notWall(x,y+1,walls) else 0)/surface
-        features["hallway-2"] = (self.inHallwayRec(x-1,y,(x,y),walls) if self.notWall(x-1,y,walls) else 0)/surface
-        features["hallway-3"] = (self.inHallwayRec(x,y-1,(x,y),walls) if self.notWall(x,y-1,walls) else 0)/surface
+        features["hallway-0"] = (self.inHallwayRec(y+1, x,   (y,x), walls) if self.notWall(y+1, x,   walls) else 0)/surface
+        features["hallway-1"] = (self.inHallwayRec(y,   x+1, (y,x), walls) if self.notWall(y,   x+1, walls) else 0)/surface
+        features["hallway-2"] = (self.inHallwayRec(y-1, x,   (y,x), walls) if self.notWall(y-1, x,   walls) else 0)/surface
+        features["hallway-3"] = (self.inHallwayRec(y,   x-1, (y,x), walls) if self.notWall(y,   x-1, walls) else 0)/surface
 
 
 
@@ -195,6 +195,8 @@ class SimpleExtractor(FeatureExtractor):
     # ------------------------------------------------------------------------------------------------------------------
 
     def shortestPath(self,start_x,start_y,dest_x,dest_y,walls): # A* algorithm
+        if not self.notWall(start_x,start_y,walls) or not self.notWall(dest_x,dest_y,walls):
+            return []
         visited = set()
         q = util.PriorityQueue()
         q.push([(start_x,start_y),[],0],0)

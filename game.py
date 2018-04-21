@@ -564,6 +564,13 @@ class Game:
         sys.stdout = OLD_STDOUT
         sys.stderr = OLD_STDERR
 
+    # EDITTED
+    def calcAllPaths(self, x, y, walls, agent, height, width):
+        paths = []
+        for i in range(1, height-1):
+            for j in range(1, width-1):
+                paths.append(len(agent.featExtractor.shortestPath(x, y, i, j, walls)))
+                #print(len(a),(x,y),(i,j))
 
     def run( self ):
         """
@@ -573,7 +580,14 @@ class Game:
         self.numMoves = 0
 
         # EDITTED
-        temporaryVar = self.state.data.food
+        walls = self.state.data.layout.walls
+        width = walls.width
+        height = walls.height
+        #a = walls[width-1][height-1]
+        shortestDistances = [[self.calcAllPaths(i,j,walls,self.agents[0],height,width) for i in range(1,height-1)] for j in range(1,width-1)]
+        #for i in range(0,width):
+        #    for j in range(0,height):
+        #        shortestDistances[width][height] = self.agents[0].featExtractor.shortestPath(1,1,3,3,walls)
         # TODO calculate shortest distances to every position with A*
         ###self.display.initialize(self.state.makeObservation(1).data)
         # inform learning agents of the game start
@@ -732,3 +746,7 @@ class Game:
                     self.unmute()
                     return
         self.display.finish()
+
+
+
+
