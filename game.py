@@ -565,12 +565,23 @@ class Game:
         sys.stderr = OLD_STDERR
 
     # EDITTED
-    def calcAllPaths(self, x, y, walls, agent, height, width):
-        paths = []
-        for i in range(1, height-1):
-            for j in range(1, width-1):
-                paths.append(len(agent.featExtractor.shortestPath(x, y, i, j, walls)))
+
+    #def calcAllPaths(self, x, y, walls, agent, height, width):
+    #    paths = []
+    #    for i in range(1, height-1):
+    #        for j in range(1, width-1):
+    #            paths.append(len(agent.featExtractor.shortestPath(x, y, i, j, walls)))
                 #print(len(a),(x,y),(i,j))
+    #    return paths
+
+    def calcAllPaths(self,walls,agent,height,width):
+        res = {}
+        for a in range(1, height - 1):
+            for b in range(1, width - 1):
+                for c in range(1, height - 1):
+                    for d in range(1, width - 1):
+                        res["("+ str(a) + "," + str(b) + ")->(" + str(c) + "," + str(d) + ")"] = len(agent.featExtractor.shortestPath(a,b,c,d,walls))
+        return res
 
     def run( self ):
         """
@@ -584,16 +595,13 @@ class Game:
         width = walls.width
         height = walls.height
         #a = walls[width-1][height-1]
-        shortestDistances = [[self.calcAllPaths(i,j,walls,self.agents[0],height,width) for i in range(1,height-1)] for j in range(1,width-1)]
-        #for i in range(0,width):
-        #    for j in range(0,height):
-        #        shortestDistances[width][height] = self.agents[0].featExtractor.shortestPath(1,1,3,3,walls)
-        # TODO calculate shortest distances to every position with A*
-        ###self.display.initialize(self.state.makeObservation(1).data)
+        #shortestDistances = [[pathLen for pLenList in [self.calcAllPaths(i,j,walls,self.agents[0],height,width) for i in range(1,height-1)] for pathLen in pLenList] for j in range(1,width-1)]
+        shortestDistances = self.calcAllPaths(walls,self.agents[0],height,width)
         # inform learning agents of the game start
         for i in range(len(self.agents)):
             # TODO add matrix to every agents properties
             agent = self.agents[i]
+            agent.featExtractor.paths = shortestDistances
             if not agent:
                 self.mute(i)
                 # this is a null agent, meaning it failed to load

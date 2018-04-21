@@ -66,6 +66,9 @@ def closestFood(pos, food, walls):
 
 class SimpleExtractor(FeatureExtractor):
 
+    def __init__(self):
+        self.paths = {} # will have all possible shortest paths - filled in in game.py in the 'run' function
+
     """
     Returns simple features for a basic reflex Pacman:
     - whether food will be eaten
@@ -92,22 +95,18 @@ class SimpleExtractor(FeatureExtractor):
 
         features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime*1.0)
         features["bias"] = 1.0
-        #inputList = zip(ghosts,[(x,y)]*len(ghosts))
-        #ghostDistances = map(lambda q: self.shortestPath(q[0]),inputList)
 
-        # --------------------------------------------------------------------------------------------------------------
 
-        #features["#-of-ghosts-n-steps-away"] = len(filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0][0],q[0][1],q[1][0],q[1][1],walls),inputList)))
         features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
         notScared = list(filter(lambda q: q[1].scaredTimer == 0,zip(ghosts, ghostStates)))
         features["#-of-not-scared-ghosts-n-steps-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) < n for g in notScared)
+
+        #features["#-of-ghosts-n-steps-away"] = len(filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0][0],q[0][1],q[1][0],q[1][1],walls),inputList)))
         #features["#-of-ghosts-n-steps-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
 
-        # --------------------------------------------------------------------------------------------------------------
 
         features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x,y,q[0],q[1]) < n,ghosts)) - len(notScared)
 
-        # --------------------------------------------------------------------------------------------------------------
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
@@ -134,6 +133,15 @@ class SimpleExtractor(FeatureExtractor):
         features["hallway-1"] = (self.inHallwayRec(y,   x+1, (y,x), walls) if self.notWall(y,   x+1, walls) else 0)/surface
         features["hallway-2"] = (self.inHallwayRec(y-1, x,   (y,x), walls) if self.notWall(y-1, x,   walls) else 0)/surface
         features["hallway-3"] = (self.inHallwayRec(y,   x-1, (y,x), walls) if self.notWall(y,   x-1, walls) else 0)/surface
+
+        features["closest-ghost-0"] = (self.paths if self.notWall(y + 1, x,
+                                                                                            walls) else 0) / surface
+        features["closest-ghost-1"] = (self.inHallwayRec(y, x + 1, (y, x), walls) if self.notWall(y, x + 1,
+                                                                                            walls) else 0) / surface
+        features["closest-ghost-2"] = (self.inHallwayRec(y - 1, x, (y, x), walls) if self.notWall(y - 1, x,
+                                                                                            walls) else 0) / surface
+        features["closest-ghost-3"] = (self.inHallwayRec(y, x - 1, (y, x), walls) if self.notWall(y, x - 1,
+                                                                                           walls) else 0) / surface
 
 
 
