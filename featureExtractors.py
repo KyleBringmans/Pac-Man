@@ -19,6 +19,9 @@ import util
 import math
 
 class FeatureExtractor:
+    def __init__(self):
+        self.paths = {}  # will have all possible shortest paths - filled in in game.py in the 'run' function
+
     def getFeatures(self, state, action):
         """
           Returns a dict from features to counts
@@ -66,8 +69,6 @@ def closestFood(pos, food, walls):
 
 class SimpleExtractor(FeatureExtractor):
 
-    def __init__(self):
-        self.paths = {} # will have all possible shortest paths - filled in in game.py in the 'run' function
 
     """
     Returns simple features for a basic reflex Pacman:
@@ -134,14 +135,14 @@ class SimpleExtractor(FeatureExtractor):
         features["hallway-2"] = (self.inHallwayRec(y-1, x,   (y,x), walls) if self.notWall(y-1, x,   walls) else 0)/surface
         features["hallway-3"] = (self.inHallwayRec(y,   x-1, (y,x), walls) if self.notWall(y,   x-1, walls) else 0)/surface
 
-        features["closest-ghost-0"] = (self.paths if self.notWall(y + 1, x,
-                                                                                            walls) else 0) / surface
-        features["closest-ghost-1"] = (self.inHallwayRec(y, x + 1, (y, x), walls) if self.notWall(y, x + 1,
-                                                                                            walls) else 0) / surface
-        features["closest-ghost-2"] = (self.inHallwayRec(y - 1, x, (y, x), walls) if self.notWall(y - 1, x,
-                                                                                            walls) else 0) / surface
-        features["closest-ghost-3"] = (self.inHallwayRec(y, x - 1, (y, x), walls) if self.notWall(y, x - 1,
-                                                                                           walls) else 0) / surface
+        features["closest-ghost-0"] =  (self.closestGhostDist(x+1,y,ghosts,walls.width,walls.height) if self.notWall(y,x+1,walls) else 0)/surface
+        features["closest-ghost-0"] = (self.closestGhostDist(x-1, y, ghosts, walls.width,walls.height) if self.notWall(y, x-1,walls) else 0) / surface
+        features["closest-ghost-0"] = (self.closestGhostDist(x, y+1, ghosts, walls.width,walls.height) if self.notWall(y + 1, x,walls) else 0) / surface
+        features["closest-ghost-0"] = (self.closestGhostDist(x, y-1, ghosts, walls.width,walls.height) if self.notWall(y - 1, x,walls) else 0) / surface
+
+        #features["closest-ghost-1"] = (self.inHallwayRec(y, x + 1, (y, x), walls) if self.notWall(y, x + 1,walls) else 0) / surface
+        #features["closest-ghost-2"] = (self.inHallwayRec(y - 1, x, (y, x), walls) if self.notWall(y - 1, x,walls) else 0) / surface
+        #features["closest-ghost-3"] = (self.inHallwayRec(y, x - 1, (y, x), walls) if self.notWall(y, x - 1,walls) else 0) / surface
 
 
 
@@ -262,7 +263,7 @@ class SimpleExtractor(FeatureExtractor):
                     corners += 1
         return corners
 
-        # TODO ehhhh is this correct?
+    # TODO ehhhh is this correct?
 
     def isCorner(self, corner, walls):
         if self.wallNeighbours(corner[0], walls) > 0 and self.wallNeighbours(corner[2], walls) > 0:
@@ -278,3 +279,14 @@ class SimpleExtractor(FeatureExtractor):
                 w += 1
         return w
 
+
+    def closestGhostDist(self,x,y,ghosts,width,height):
+        distances = []
+        for g in ghosts:
+            index = self.posInPaths(x,y,g[0],g[1],width,height)
+
+            distances.append(self.paths[int(index[0])][int(index[1])])
+        return min(distances)
+
+    def posInPaths(self, x1, y1, x2, y2, width, height):
+        return y1 * width + x1, y2 * width + x2

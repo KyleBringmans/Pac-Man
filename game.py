@@ -19,7 +19,6 @@
 # purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
-
 from util import *
 import time, os
 import traceback
@@ -566,24 +565,25 @@ class Game:
 
     # EDITTED
 
-    #def calcAllPaths(self, x, y, walls, agent, height, width):
-    #    paths = []
-    #    for i in range(1, height-1):
-    #        for j in range(1, width-1):
-    #            paths.append(len(agent.featExtractor.shortestPath(x, y, i, j, walls)))
+    def calcAllPaths(self, x, y, walls, agent, height, width):
+        paths = []
+        for i in range(0, height):
+            for j in range(0, width):
+                paths.append(len(agent.featExtractor.shortestPath(x, y, i, j, walls)))
                 #print(len(a),(x,y),(i,j))
-    #    return paths
+        return paths
 
-    def calcAllPaths(self,walls,agent,height,width):
-        res = {}
-        for a in range(1, height - 1):
-            for b in range(1, width - 1):
-                for c in range(1, height - 1):
-                    for d in range(1, width - 1):
-                        res["("+ str(a) + "," + str(b) + ")->(" + str(c) + "," + str(d) + ")"] = len(agent.featExtractor.shortestPath(a,b,c,d,walls))
-        return res
+    #def calcAllPaths(self,walls,agent,height,width):
+    #    res = {}
+    #    for a in range(1, height - 1):
+    #        for b in range(1, width - 1):
+    #            for c in range(1, height - 1):
+    #                for d in range(1, width - 1):
+    #                    # res[buh] = len(agent.featExtractor.shortestPath(a,b,c,d,walls))
+    #    return res
 
     def run( self ):
+        from qlearningAgents import ApproximateQAgent
         """
         Main control loop for game play.
         """
@@ -594,14 +594,22 @@ class Game:
         walls = self.state.data.layout.walls
         width = walls.width
         height = walls.height
-        #a = walls[width-1][height-1]
-        #shortestDistances = [[pathLen for pLenList in [self.calcAllPaths(i,j,walls,self.agents[0],height,width) for i in range(1,height-1)] for pathLen in pLenList] for j in range(1,width-1)]
-        shortestDistances = self.calcAllPaths(walls,self.agents[0],height,width)
+        #shortestDistances = [[self.calcAllPaths(i,j,walls,self.agents[0],height,width) for i in range(0,height)] for j in range(0,width)]
+        shortestDistances = [0] * (width*height)
+        k = 0
+        for i in range (0,height):
+            for j in range (0,width):
+                shortestDistances[k] =  self.calcAllPaths(i,j,walls,self.agents[0],height,width)
+                k+=1
+        #shortestDistances = self.calcAllPaths(walls,self.agents[0],height,width)
+
         # inform learning agents of the game start
         for i in range(len(self.agents)):
-            # TODO add matrix to every agents properties
             agent = self.agents[i]
-            agent.featExtractor.paths = shortestDistances
+
+            if(agent.__class__ == ApproximateQAgent):
+                agent.featExtractor.paths = shortestDistances
+
             if not agent:
                 self.mute(i)
                 # this is a null agent, meaning it failed to load
