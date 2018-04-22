@@ -86,7 +86,7 @@ class SimpleExtractor(FeatureExtractor):
         ghosts = state.getGhostPositions()
         ghostStates = state.getGhostStates()
         sTime = state.getScaredTime()
-        maxPathLen = walls.height * walls.width * 1.0
+        maxPathLen = max([walls.height,walls.width])*1.0
         n = 3  # distance instead of 1
         features = util.Counter()
 
@@ -165,6 +165,16 @@ class SimpleExtractor(FeatureExtractor):
             index = self.posInPaths(nearest[0], nearest[1], intersect[3][1], intersect[3][0], walls.width, walls.height)
             distHallwayGhost[3] = self.paths[index[0]][index[1]]
 
+        distHallwayGhost = [0 if q is None else q for q in distHallwayGhost]
+
+        if intersect[0] != None:
+            features["danger-value-0"] = (maxPathLen + features["hallway-0"] - distHallwayGhost[0])/maxPathLen
+        if intersect[1] != None:
+            features["danger-value-1"] = (maxPathLen + features["hallway-1"] - distHallwayGhost[0]) / maxPathLen
+        if intersect[2] != None:
+            features["danger-value-2"] = (maxPathLen + features["hallway-2"] - distHallwayGhost[0]) / maxPathLen
+        if intersect[3] != None:
+            features["danger-value-3"] = (maxPathLen + features["hallway-3"] - distHallwayGhost[0]) / maxPathLen
 
         features.divideAll(10.0)
 
