@@ -19,8 +19,10 @@ import util
 import math
 
 class FeatureExtractor:
+    # EDITTED
     def __init__(self):
         self.paths = {}  # will have all possible shortest paths - filled in in game.py in the 'run' function
+    # EDITTED
 
     def getFeatures(self, state, action):
         """
@@ -77,7 +79,6 @@ class SimpleExtractor(FeatureExtractor):
     - whether a ghost collision is imminent
     - whether a ghost is one step away
     """
-    # TODO add class-variable to be assigned to the matrix of shortest paths
     def getFeatures(self, state, action):
         # extract the grid of food and wall locations and get the ghost locations
         food = state.getFood()
@@ -85,9 +86,9 @@ class SimpleExtractor(FeatureExtractor):
         ghosts = state.getGhostPositions()
         ghostStates = state.getGhostStates()
         sTime = state.getScaredTime()
+        maxPathLen = walls.height * walls.width * 1.0
         n = 3  # distance instead of 1
         features = util.Counter()
-
 
         # compute the location of pacman after he takes the action
         x, y = state.getPacmanPosition()
@@ -105,9 +106,7 @@ class SimpleExtractor(FeatureExtractor):
         #features["#-of-ghosts-n-steps-away"] = len(filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0][0],q[0][1],q[1][0],q[1][1],walls),inputList)))
         #features["#-of-ghosts-n-steps-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
 
-
         features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x,y,q[0],q[1]) < n,ghosts)) - len(notScared)
-
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
@@ -127,28 +126,47 @@ class SimpleExtractor(FeatureExtractor):
         if distCapsule is not None:
             features["closest-capsule"] = float(distCapsule) / (walls.width * walls.height)
 
+        features["hallway-0"] = (self.inHallwayRec(y+1, x,   (y,x), walls) if self.notWall(y+1, x,   walls) else 0) / maxPathLen
+        features["hallway-1"] = (self.inHallwayRec(y,   x+1, (y,x), walls) if self.notWall(y,   x+1, walls) else 0) / maxPathLen
+        features["hallway-2"] = (self.inHallwayRec(y-1, x,   (y,x), walls) if self.notWall(y-1, x,   walls) else 0) / maxPathLen
+        features["hallway-3"] = (self.inHallwayRec(y,   x-1, (y,x), walls) if self.notWall(y,   x-1, walls) else 0) / maxPathLen
 
+        features["closest-ghost-0"] = (self.closestGhostDist(x+1, y, ghosts, walls.width,walls.height) if self.notWall(y, x + 1,walls) else 0) / maxPathLen
+        features["closest-ghost-1"] = (self.closestGhostDist(x-1, y, ghosts, walls.width,walls.height) if self.notWall(y, x - 1,walls) else 0) / maxPathLen
+        features["closest-ghost-2"] = (self.closestGhostDist(x, y+1, ghosts, walls.width,walls.height) if self.notWall(y + 1, x,walls) else 0) / maxPathLen
+        features["closest-ghost-3"] = (self.closestGhostDist(x, y-1, ghosts, walls.width,walls.height) if self.notWall(y - 1, x,walls) else 0) / maxPathLen
 
-        surface = walls.height*walls.width*1.0
-        features["hallway-0"] = (self.inHallwayRec(y+1, x,   (y,x), walls) if self.notWall(y+1, x,   walls) else 0)/surface
-        features["hallway-1"] = (self.inHallwayRec(y,   x+1, (y,x), walls) if self.notWall(y,   x+1, walls) else 0)/surface
-        features["hallway-2"] = (self.inHallwayRec(y-1, x,   (y,x), walls) if self.notWall(y-1, x,   walls) else 0)/surface
-        features["hallway-3"] = (self.inHallwayRec(y,   x-1, (y,x), walls) if self.notWall(y,   x-1, walls) else 0)/surface
+        #a = self.closestIntersect(x,y,(x,y+1),walls)
 
-        features["closest-ghost-0"] =  (self.closestGhostDist(x+1,y,ghosts,walls.width,walls.height) if self.notWall(y,x+1,walls) else 0)/surface
-        features["closest-ghost-0"] = (self.closestGhostDist(x-1, y, ghosts, walls.width,walls.height) if self.notWall(y, x-1,walls) else 0) / surface
-        features["closest-ghost-0"] = (self.closestGhostDist(x, y+1, ghosts, walls.width,walls.height) if self.notWall(y + 1, x,walls) else 0) / surface
-        features["closest-ghost-0"] = (self.closestGhostDist(x, y-1, ghosts, walls.width,walls.height) if self.notWall(y - 1, x,walls) else 0) / surface
+        distHallwayGhost = [None]*4
+        intersect = [None]*4
+        notScared = map(lambda (a,b): a, notScared)
+        nearest = self.closestGhost(x, y + 1, notScared, walls.width, walls.height)
+        intersect[0] = self.closestIntersect(x, y+1, (x, y), walls)
+        if intersect[0] != None:
+            index = self.posInPaths(nearest[0], nearest[1], intersect[0][1], intersect[0][0],walls.width,walls.height)
+            distHallwayGhost[0] = self.paths[index[0]][index[1]]
 
-        #features["closest-ghost-1"] = (self.inHallwayRec(y, x + 1, (y, x), walls) if self.notWall(y, x + 1,walls) else 0) / surface
-        #features["closest-ghost-2"] = (self.inHallwayRec(y - 1, x, (y, x), walls) if self.notWall(y - 1, x,walls) else 0) / surface
-        #features["closest-ghost-3"] = (self.inHallwayRec(y, x - 1, (y, x), walls) if self.notWall(y, x - 1,walls) else 0) / surface
+        nearest = self.closestGhost(x, y - 1, notScared, walls.width, walls.height)
+        intersect[1] = self.closestIntersect(x, y-1, (x, y), walls)
+        if intersect[1] != None:
+            index = self.posInPaths(nearest[0], nearest[1], intersect[1][1], intersect[1][0], walls.width, walls.height)
+            distHallwayGhost[1] = self.paths[index[0]][index[1]]
 
+        nearest = self.closestGhost(x + 1, y, notScared, walls.width, walls.height)
+        intersect[2] = self.closestIntersect(x+1, y, (x, y), walls)
+        if intersect[2] != None:
+            index = self.posInPaths(nearest[0], nearest[1], intersect[2][1], intersect[2][0], walls.width, walls.height)
+            distHallwayGhost[2] = self.paths[index[0]][index[1]]
 
+        nearest = self.closestGhost(x - 1, y, notScared, walls.width, walls.height)
+        intersect[3] = self.closestIntersect(x-1, y, (x, y), walls)
+        if intersect[3] != None:
+            index = self.posInPaths(nearest[0], nearest[1], intersect[3][1], intersect[3][0], walls.width, walls.height)
+            distHallwayGhost[3] = self.paths[index[0]][index[1]]
 
 
         features.divideAll(10.0)
-
 
         return features
 
@@ -194,6 +212,19 @@ class SimpleExtractor(FeatureExtractor):
             return 1
         else:
             return 0
+
+    def closestIntersect(self,x,y,origin,walls):
+        nbrs = self.getNeighboursSimple(x,y,walls)
+        # don't count doubles (spots counted in previous iteration)
+        nbrs = filter(lambda q: q != origin, nbrs)
+        # check if there are the correct # of nbr walls -> hallway
+        if len(nbrs) == 1:
+            fst = nbrs[0]
+            return self.closestIntersect(fst[0], fst[1], (x,y), walls)
+        elif len(nbrs) == 2:
+            return x,y
+        else:
+            return None
 
     def getDirectionalNeighbour(self,x,y,direction):
         return x + direction[0], y + direction[1]
@@ -287,6 +318,14 @@ class SimpleExtractor(FeatureExtractor):
 
             distances.append(self.paths[int(index[0])][int(index[1])])
         return min(distances)
+
+    def closestGhost(self,x,y,ghosts,width,height):
+        distances = []
+        for g in ghosts:
+            index = self.posInPaths(x,y,g[0],g[1],width,height)
+
+            distances.append((g,self.paths[int(index[0])][int(index[1])]))
+        return min(distances, key= lambda q: q[1])[0]
 
     def posInPaths(self, x1, y1, x2, y2, width, height):
         return y1 * width + x1, y2 * width + x2
