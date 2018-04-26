@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="05ceb907-e9e1-4523-8de5-e5257eedf08a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/featureExtractors.py" afterPath="$PROJECT_DIR$/featureExtractors.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pacman.py" afterPath="$PROJECT_DIR$/pacman.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/qlearningAgents.py" afterPath="$PROJECT_DIR$/qlearningAgents.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/util.py" afterPath="$PROJECT_DIR$/util.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,8 +19,8 @@
       <file leaf-file-name="featureExtractors.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/featureExtractors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="89" column="0" lean-forward="false" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
+            <state relative-caret-position="-3487">
+              <caret line="23" column="23" lean-forward="false" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
               <folding>
                 <element signature="e#717#753#0" expanded="true" />
               </folding>
@@ -25,7 +28,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mediumGrid.lay" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mediumGrid.lay" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/layouts/mediumGrid.lay">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="144">
@@ -38,9 +41,23 @@
       <file leaf-file-name="qlearningAgents.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/qlearningAgents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2310">
-              <caret line="158" column="0" lean-forward="false" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="608">
+              <caret line="94" column="69" lean-forward="false" selection-start-line="94" selection-start-column="69" selection-end-line="94" selection-end-column="69" />
+              <folding>
+                <element signature="e#667#712#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="util.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/util.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="582">
+              <caret line="708" column="26" lean-forward="false" selection-start-line="708" selection-start-column="26" selection-end-line="708" selection-end-column="26" />
+              <folding>
+                <element signature="e#646#656#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -48,8 +65,8 @@
       <file leaf-file-name="game.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/game.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10755">
-              <caret line="720" column="0" lean-forward="false" selection-start-line="720" selection-start-column="0" selection-end-line="720" selection-end-column="0" />
+            <state relative-caret-position="391">
+              <caret line="610" column="39" lean-forward="false" selection-start-line="610" selection-start-column="39" selection-end-line="610" selection-end-column="39" />
               <folding />
             </state>
           </provider>
@@ -78,8 +95,8 @@
       <file leaf-file-name="pacman.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pacman.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="9765">
-              <caret line="658" column="0" lean-forward="false" selection-start-line="658" selection-start-column="0" selection-end-line="658" selection-end-column="0" />
+            <state relative-caret-position="371">
+              <caret line="289" column="0" lean-forward="true" selection-start-line="289" selection-start-column="0" selection-end-line="289" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -131,6 +148,7 @@
       <find>8</find>
       <find>print</find>
       <find>maxPathLen</find>
+      <find>new</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -148,12 +166,13 @@
         <option value="$PROJECT_DIR$/gridworld.py" />
         <option value="$PROJECT_DIR$/layouts/custom2" />
         <option value="$PROJECT_DIR$/layouts/custom2.lay" />
-        <option value="$PROJECT_DIR$/qlearningAgents.py" />
-        <option value="$PROJECT_DIR$/pacman.py" />
-        <option value="$PROJECT_DIR$/game.py" />
         <option value="$PROJECT_DIR$/layouts/custom.lay" />
         <option value="$PROJECT_DIR$/layouts/mediumClassic.lay" />
         <option value="$PROJECT_DIR$/featureExtractors.py" />
+        <option value="$PROJECT_DIR$/qlearningAgents.py" />
+        <option value="$PROJECT_DIR$/game.py" />
+        <option value="$PROJECT_DIR$/pacman.py" />
+        <option value="$PROJECT_DIR$/util.py" />
       </list>
     </option>
   </component>
@@ -326,7 +345,7 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.39" sideWeight="0.49761903" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39" sideWeight="0.49761903" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -366,12 +385,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/featureExtractors.py</url>
-          <line>169</line>
+          <line>202</line>
           <option name="timeStamp" value="164" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/featureExtractors.py</url>
-          <line>89</line>
+          <line>122</line>
           <option name="timeStamp" value="165" />
         </line-breakpoint>
       </breakpoints>
@@ -530,13 +549,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="190">
           <caret line="289" column="0" lean-forward="false" selection-start-line="289" selection-start-column="0" selection-end-line="289" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="255" column="0" lean-forward="false" selection-start-line="255" selection-start-column="0" selection-end-line="255" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -704,40 +716,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pacman.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9765">
-          <caret line="658" column="0" lean-forward="false" selection-start-line="658" selection-start-column="0" selection-end-line="658" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qlearningAgents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2310">
-          <caret line="158" column="0" lean-forward="false" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/game.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10755">
-          <caret line="720" column="0" lean-forward="false" selection-start-line="720" selection-start-column="0" selection-end-line="720" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/featureExtractors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="89" column="0" lean-forward="false" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
-          <folding>
-            <element signature="e#717#753#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/layouts/mediumClassic.lay">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -746,11 +724,57 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/qlearningAgents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="94" column="69" lean-forward="false" selection-start-line="94" selection-start-column="69" selection-end-line="94" selection-end-column="69" />
+          <folding>
+            <element signature="e#667#712#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/layouts/mediumGrid.lay">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
           <caret line="3" column="8" lean-forward="true" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="8" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/game.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="610" column="39" lean-forward="false" selection-start-line="610" selection-start-column="39" selection-end-line="610" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pacman.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="289" column="0" lean-forward="true" selection-start-line="289" selection-start-column="0" selection-end-line="289" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/featureExtractors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3487">
+          <caret line="23" column="23" lean-forward="false" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
+          <folding>
+            <element signature="e#717#753#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="582">
+          <caret line="708" column="26" lean-forward="false" selection-start-line="708" selection-start-column="26" selection-end-line="708" selection-end-column="26" />
+          <folding>
+            <element signature="e#646#656#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

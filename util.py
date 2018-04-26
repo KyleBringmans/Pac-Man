@@ -15,6 +15,7 @@
 import sys
 import inspect
 import heapq, random
+import numpy as np
 import cStringIO
 
 
@@ -577,6 +578,60 @@ def pause():
     print "<Press enter/return to continue>"
     raw_input()
 
+def tanh(Z):
+    A = np.tanh(Z)
+    cache = Z
+
+    return A, cache
+
+
+def tanhBackward(dA, cache):
+    Z = cache
+
+    dZ = 1 - np.tanh(Z)**2
+
+    assert (dZ.shape == Z.shape)
+
+    return dZ
+
+
+def sigmoid(Z):
+    A = 1 / (1 + np.exp(-Z))
+    cache = Z
+
+    return A, cache
+
+
+def sigmoidBackward(dA, cache):
+    Z = cache
+
+    s = 1 / (1 + np.exp(-Z))
+    dZ = dA * s * (1 - s)
+
+    assert (dZ.shape == Z.shape)
+
+    return dZ
+
+
+def relu(Z):
+    A = np.maximum(0, Z)
+
+    assert (A.shape == Z.shape)
+
+    cache = Z
+    return A, cache
+
+
+def reluBackward(dA, cache):
+    Z = cache
+    dZ = np.array(dA, copy=True)  # just converting dz to a correct object.
+
+    # When z <= 0, you should set dz to 0 as well.
+    dZ[Z <= 0] = 0
+
+    assert (dZ.shape == Z.shape)
+
+    return dZ
 
 # code to handle timeouts
 #
@@ -651,3 +706,23 @@ def unmutePrint():
     sys.stdout = _ORIGINAL_STDOUT
     #sys.stderr = _ORIGINAL_STDERR
 
+# TODO choose A* algorithm
+def calculateDistMap(walls):
+    distMap = {}
+    evaluated = []
+    for x in range(0, walls.width):
+        for y in range(0, walls.height):
+            if walls[x][y]:
+                pass
+            else:
+                distMap[(x, y), (x, y)] = 0
+                for i in range(0, walls.width):
+                    for j in range(0, walls.height):
+                        if ((i, j) in evaluated) or walls[i][j] or (i == x and j == y):
+                            pass
+                        else:
+                            distMap[(x, y), (i, j)] = aStarDistance((x, y), (i, j), walls)
+                            distMap[(i, j), (x, y)] = distMap[(x, y), (i, j)]
+            evaluated.append((x, y))
+
+    return distMap

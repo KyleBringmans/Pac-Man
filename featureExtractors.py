@@ -69,6 +69,39 @@ def closestFood(pos, food, walls):
     # no food found
     return None
 
+def distToClosestCapsule(pos, capsules, distMap):
+    distance = float('inf')
+    if capsules:
+        for capsule in capsules:
+            distToCapsule = distMap[pos, capsule]
+            if distToCapsule < distance:
+                distance = distToCapsule
+    return distance
+
+def chooseNextCrossroad(crossroads, ghostsPos, pacmanPos, distMap, walls):
+    sortedCrossroads = []
+    sorted = False
+    while not sorted:
+        if len(sortedCrossroads) < len(crossroads):
+            closest = random.choice(crossroads)
+            for crossroad in crossroads:
+                if distMap[crossroad, pacmanPos] < distMap[closest, pacmanPos] and crossroad not in sortedCrossroads:
+                    closest = crossroad
+            sortedCrossroads.append(closest)
+        else:
+            sorted = True
+
+    for i in range(0, len(sortedCrossroads)):
+        reachable = util.accessibleAStar(pacmanPos, sortedCrossroads[i], ghostsPos, walls)
+        if reachable:
+            return sortedCrossroads[i]
+
+    return sortedCrossroads[len(sortedCrossroads) - 1]
+
+def vectorSum(vec1, vec2):
+    return (vec1[0] + vec2[0], vec1[1] + vec2[1])
+
+
 class SimpleExtractor(FeatureExtractor):
 
 

@@ -48,6 +48,10 @@ from util import manhattanDistance
 import util, layout
 import sys, types, time, random, os
 
+#EDITTED
+MAX_REWARD = 500
+#EDITTED
+
 ###################################################
 # YOUR INTERFACE TO THE PACMAN WORLD: A GameState #
 ###################################################
@@ -70,6 +74,7 @@ class GameState:
     ####################################################
     # Accessor methods: use these to access state data #
     ####################################################
+
 
     def getScaredTime(self):
         return SCARED_TIME
@@ -274,10 +279,9 @@ class ClassicGameRules:
     def __init__(self, timeout=30):
         self.timeout = timeout
 
-    def newGame( self, layout, pacmanAgent, ghostAgents, display, quiet = False, catchExceptions=False):
-        agents = [pacmanAgent] + ghostAgents[:layout.getNumGhosts()]
+    def newGame( self, layout, agents, display, quiet = False, catchExceptions=False):
         initState = GameState()
-        initState.initialize( layout, len(ghostAgents) )
+        initState.initialize(layout, layout.getNumGhosts())
         game = Game(agents, display, self, catchExceptions=catchExceptions)
         game.state = initState
         self.initialState = initState.deepCopy()
@@ -639,6 +643,12 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
 
     rules = ClassicGameRules(timeout)
     games = []
+    agents = [pacman] + ghosts[:layout.getNumGhosts()]
+    # calculate the map of distances
+    distMap = util.calculateDistMap(layout.getWalls())
+    for agent in agents:
+        if 'setDistMap' in dir(agent):
+            agent.setDistMap(distMap)
 
     for i in range( numGames ):
         # EDITTED
@@ -653,7 +663,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         else:
             gameDisplay = display
             rules.quiet = False
-        game = rules.newGame( layout, pacman, ghosts, gameDisplay, beQuiet, catchExceptions)
+        game = rules.newGame( layout,agents, gameDisplay, beQuiet, catchExceptions)
         game.run()
         if not beQuiet: games.append(game)
 
