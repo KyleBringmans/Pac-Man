@@ -170,22 +170,20 @@ class SimpleExtractor(FeatureExtractor):
         if distCapsule is not None:
             features["closest-capsule"] = float(distCapsule) / (walls.width * walls.height)
 
-        features["hallway-0"] = (self.inHallwayRec(y + 1, x, (y, x), walls) if self.notWall(y + 1, x,
-                                                                                            walls) else 0) / maxPathLen
-        features["hallway-1"] = (self.inHallwayRec(y, x + 1, (y, x), walls) if self.notWall(y, x + 1,
-                                                                                            walls) else 0) / maxPathLen
-        features["hallway-2"] = (self.inHallwayRec(y - 1, x, (y, x), walls) if self.notWall(y - 1, x,
-                                                                                            walls) else 0) / maxPathLen
-        features["hallway-3"] = (self.inHallwayRec(y, x - 1, (y, x), walls) if self.notWall(y, x - 1,
-                                                                                            walls) else 0) / maxPathLen
-
         positions = self.generateAllNeighboursSimple(x, y)
+
+        # FEATURE: HALLWAY
+        for i in range(0, 4):
+            features["hallway-%i" % i] = (self.inHallwayRec(positions[i][0], positions[i][1], (x,y), walls) if self.notWall(positions[i][0], positions[i][1], walls) else 0) / maxPathLen
+
+        # FEATURE: CLOSEST GHOST
         for i in range(0, 4):
             dist = self.closestGhostDist(positions[i][0], positions[i][1], ghosts, walls)
             if dist is not None:
                 features["closest-ghost-%i" % i] = dist / maxPathLen
 
 
+        # FEATURE: DANGER VALUE
         distHallwayGhost = [None] * 4
         intersect = [None] * 4
         notScared = map(lambda (a, b): a, notScared)

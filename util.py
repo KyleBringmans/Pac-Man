@@ -733,45 +733,6 @@ def calculateDistMap(walls):
 
     return distMap
 
-def aStarDistance(start, end, walls):
-    # initialize the necessary lists
-    openSet = [start]  # list with discovered positions to visit
-    closedSet = []  # list with positions already evaluated
-    gScore = {start: 0}
-    fScore = {start: heuristic(start, end)}
-
-    while openSet:
-        # find the position with the smallest f score
-        current = random.choice(openSet)
-        for pos in openSet:
-            if fScore[pos] < fScore[current]:
-                current = pos
-
-        # if the position with the smallest score is the end, we have arrived
-        # calculate the total distance along this path
-        if current == end:
-            return int(gScore[current])
-
-        openSet.remove(current)
-        closedSet.append(current)
-
-        for neighbour in getLegalNeighbors(current, walls):
-            # ignore a neighbour that was already evaluated
-            if neighbour in closedSet:
-                continue
-            # discover a new node
-            if neighbour not in openSet:
-                openSet.append(neighbour)
-                gScore[neighbour] = float('inf')
-            if gScore[current] + STEP_SIZE > gScore[neighbour]:
-                continue
-            gScore[neighbour] = gScore[current] + STEP_SIZE
-            fScore[neighbour] = gScore[neighbour] + heuristic(neighbour, end)
-
-def heuristic(pos1, pos2):
-    # underestimate the distance between the points with manhattanDistance
-    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
-
 def lastCrossroad(start, end, cameFrom, walls):
     current = end
     while getLegalNeighbors(current, walls) < 3:
