@@ -565,13 +565,13 @@ class Game:
 
     # EDITTED
 
-    def calcAllPaths(self, x, y, walls, agent, height, width):
-        paths = []
-        for i in range(0, height):
-            for j in range(0, width):
-                paths.append(len(agent.featExtractor.shortestPath(x, y, i, j, walls)))
-                #print(len(a),(x,y),(i,j))
-        return paths
+    #def calcAllPaths(self, x, y, walls, agent, height, width):
+    #    paths = []
+    #    for i in range(0, height):
+    #        for j in range(0, width):
+    #            paths.append(len(agent.featExtractor.shortestPath(x, y, i, j, walls)))
+    #            #print(len(a),(x,y),(i,j))
+    #    return paths
 
     #def calcAllPaths(self,walls,agent,height,width):
     #    res = {}
@@ -591,24 +591,26 @@ class Game:
         self.numMoves = 0
 
         # EDITTED
-        walls = self.state.data.layout.walls
-        width = walls.width
-        height = walls.height
+        #walls = self.state.data.layout.walls
+        #width = walls.width
+        #height = walls.height
         #shortestDistances = [[self.calcAllPaths(i,j,walls,self.agents[0],height,width) for i in range(0,height)] for j in range(0,width)]
-        shortestDistances = [0] * (width*height)
-        k = 0
-        for i in range (0,height):
-            for j in range (0,width):
-                shortestDistances[k] =  self.calcAllPaths(i,j,walls,self.agents[0],height,width)
-                k+=1
+        #shortestDistances = [0] * (width*height)
+        #k = 0
+        #for i in range (0,height):
+        #    for j in range (0,width):
+        #        shortestDistances[k] =  self.calcAllPaths(i,j,walls,self.agents[0],height,width)
+        #        k+=1
         #shortestDistances = self.calcAllPaths(walls,self.agents[0],height,width)
 
         # inform learning agents of the game start
         for i in range(len(self.agents)):
             agent = self.agents[i]
 
-            if(agent.__class__ == ApproximateQAgent):
-                agent.featExtractor.paths = shortestDistances
+            #EDITTED
+            #if(agent.__class__ == ApproximateQAgent):
+            #    agent.featExtractor.paths = shortestDistances
+            #EDITTED
 
             if not agent:
                 self.mute(i)

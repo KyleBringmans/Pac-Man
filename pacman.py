@@ -43,6 +43,7 @@ from game import GameStateData
 from game import Game
 from game import Directions
 from game import Actions
+import qlearningAgents
 from util import nearestPoint
 from util import manhattanDistance
 import util, layout
@@ -649,6 +650,8 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
     for agent in agents:
         if 'setDistMap' in dir(agent):
             agent.setDistMap(distMap)
+        if agent.__class__ == qlearningAgents.ApproximateQAgent:
+                agent.featExtractor.paths = distMap
 
     for i in range( numGames ):
         # EDITTED

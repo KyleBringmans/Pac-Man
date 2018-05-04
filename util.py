@@ -721,8 +721,125 @@ def calculateDistMap(walls):
                         if ((i, j) in evaluated) or walls[i][j] or (i == x and j == y):
                             pass
                         else:
-                            distMap[(x, y), (i, j)] = aStarDistance((x, y), (i, j), walls)
+                            #EDITTED-KYLE
+                            path = shortestPath(x, y, i, j, walls)
+                            if path is None:
+                                distMap[(x, y), (i, j)] = 0
+                            else:
+                                distMap[(x, y), (i, j)] = len(path)
+                            #EDITTED
                             distMap[(i, j), (x, y)] = distMap[(x, y), (i, j)]
             evaluated.append((x, y))
 
     return distMap
+
+def aStarDistance(start, end, walls):
+    # initialize the necessary lists
+    openSet = [start]  # list with discovered positions to visit
+    closedSet = []  # list with positions already evaluated
+    gScore = {start: 0}
+    fScore = {start: heuristic(start, end)}
+
+    while openSet:
+        # find the position with the smallest f score
+        current = random.choice(openSet)
+        for pos in openSet:
+            if fScore[pos] < fScore[current]:
+                current = pos
+
+        # if the position with the smallest score is the end, we have arrived
+        # calculate the total distance along this path
+        if current == end:
+            return int(gScore[current])
+
+        openSet.remove(current)
+        closedSet.append(current)
+
+        for neighbour in getLegalNeighbors(current, walls):
+            # ignore a neighbour that was already evaluated
+            if neighbour in closedSet:
+                continue
+            # discover a new node
+            if neighbour not in openSet:
+                openSet.append(neighbour)
+                gScore[neighbour] = float('inf')
+            if gScore[current] + STEP_SIZE > gScore[neighbour]:
+                continue
+            gScore[neighbour] = gScore[current] + STEP_SIZE
+            fScore[neighbour] = gScore[neighbour] + heuristic(neighbour, end)
+
+def heuristic(pos1, pos2):
+    # underestimate the distance between the points with manhattanDistance
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+
+def lastCrossroad(start, end, cameFrom, walls):
+    current = end
+    while getLegalNeighbors(current, walls) < 3:
+        current = cameFrom[current]
+        cameFrom.pop(current)
+
+        if current == start:
+            break
+
+    return current
+
+STEP_SIZE = 1
+
+def getLegalNeighbors(position, walls):
+    x, y = position
+    x_int, y_int = int(x + 0.5), int(y + 0.5)
+    neighbors = []
+
+    _directions = [(0, 1),
+                   (0, -1),
+                   (1, 0),
+                   (-1, 0)]
+
+    for vec in _directions:
+        dx, dy = vec
+        next_x = x_int + dx
+        if next_x < 0 or next_x >= walls.width: continue
+        next_y = y_int + dy
+        if next_y < 0 or next_y >= walls.height: continue
+        if not walls[next_x][next_y]: neighbors.append((next_x, next_y))
+    return neighbors
+
+def shortestPath(start_x,start_y,dest_x,dest_y,walls): # A* algorithm
+    if not notWall(start_x,start_y,walls) or not notWall(dest_x,dest_y,walls):
+        return []
+    visited = set()
+    q = PriorityQueue()
+    q.push([(start_x,start_y),[],0],0)
+    while not q.isEmpty():
+        loc,path,cost = q.pop()
+        if (dest_x,dest_y) == loc:
+            return path
+        if loc not in visited:
+            visited.add(loc)
+            for (x,y) in getNeighboursSimple(loc[0],loc[1],walls):
+                if (x,y) not in visited:
+                    backwardCost = 1 + cost
+                    forwardCost = euclDist(x,y,dest_x,dest_y)
+                    fx = backwardCost + forwardCost
+                    q.push([(x,y),path + [(x,y)],backwardCost],fx)
+
+def notWall(x,y,walls):
+    y = int(y)
+    w = walls[y]
+    x = int(x)
+    return not w[len(w) - 1 - x]
+
+def getNeighboursSimple(x,y,walls):
+    width = walls.width
+    height = walls.height
+    nbrs = generateAllNeighboursSimple(x,y)
+    nbrs = filter(lambda q: q[1] < width >= 0 and q[0] < height >= 0, nbrs) # keep nbrs in grid
+    nbrs = filter(lambda q: notWall(q[0],q[1],walls),nbrs) # remove neighbours that aren't walls
+    return nbrs
+
+def euclDist(x1,y1,x2,y2):
+    return np.sqrt(((x1-x2)**2) + ((y1-y2)**2))
+
+def generateAllNeighboursSimple(x,y):
+    return [(x+1,y),(x,y+1),(x-1,y),(x,y-1)]
+

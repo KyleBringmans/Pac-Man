@@ -14,7 +14,7 @@
 
 "Feature extractors for Pacman game states"
 
-from game import Directions, Actions
+from game import Directions, Actions, random
 import util
 import math
 
@@ -277,24 +277,7 @@ class SimpleExtractor(FeatureExtractor):
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def shortestPath(self,start_x,start_y,dest_x,dest_y,walls): # A* algorithm
-        if not self.notWall(start_x,start_y,walls) or not self.notWall(dest_x,dest_y,walls):
-            return []
-        visited = set()
-        q = util.PriorityQueue()
-        q.push([(start_x,start_y),[],0],0)
-        while not q.isEmpty():
-            loc,path,cost = q.pop()
-            if (dest_x,dest_y) == loc:
-                return path
-            if loc not in visited:
-                visited.add(loc)
-                for (x,y) in self.getNeighboursSimple(loc[0],loc[1],walls):
-                    if (x,y) not in visited:
-                        backwardCost = 1 + cost
-                        forwardCost = self.euclDist(x,y,dest_x,dest_y)
-                        fx = backwardCost + forwardCost
-                        q.push([(x,y),path + [(x,y)],backwardCost],fx)
+
 
     def notWall(self,x,y,walls):
         y = int(y)

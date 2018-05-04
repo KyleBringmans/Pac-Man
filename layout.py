@@ -65,6 +65,9 @@ class Layout:
         x, col = pos
         return self.walls[x][col]
 
+    def getWalls(self):
+        return self.walls
+
     def getRandomLegalPosition(self):
         x = random.choice(range(self.width))
         y = random.choice(range(self.height))
