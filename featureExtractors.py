@@ -179,10 +179,9 @@ class SimpleExtractor(FeatureExtractor):
         features["hallway-3"] = (self.inHallwayRec(y, x - 1, (y, x), walls) if self.notWall(y, x - 1,
                                                                                             walls) else 0) / maxPathLen
 
+        positions = self.generateAllNeighboursSimple(x, y)
         for i in range(0, 4):
-            positions = self.generateAllNeighboursSimple(x, y)
-
-            dist = self.closestGhostDist(positions[0][0], positions[0][1], ghosts, walls)
+            dist = self.closestGhostDist(positions[i][0], positions[i][1], ghosts, walls)
             if dist is not None:
                 features["closest-ghost-%i" % i] = dist / maxPathLen
 
@@ -190,36 +189,18 @@ class SimpleExtractor(FeatureExtractor):
         distHallwayGhost = [None] * 4
         intersect = [None] * 4
         notScared = map(lambda (a, b): a, notScared)
-        nearest = self.closestGhost(x, y + 1, notScared,walls)
-        intersect[0] = self.closestIntersect(x, y + 1, (x, y), walls)
-        if intersect[0] != None and nearest != None:
-            distHallwayGhost[0] = self.paths[(nearest[0], nearest[1]), (intersect[0][1], intersect[0][0])]
 
-        nearest = self.closestGhost(x, y - 1, notScared,walls)
-        intersect[1] = self.closestIntersect(x, y - 1, (x, y), walls)
-        if intersect[1] != None and nearest != None:
-            distHallwayGhost[1] = self.paths[(nearest[0], nearest[1]), (intersect[1][1], intersect[1][0])]
-
-        nearest = self.closestGhost(x + 1, y, notScared,walls)
-        intersect[2] = self.closestIntersect(x + 1, y, (x, y), walls)
-        if intersect[2] != None and nearest != None:
-            distHallwayGhost[2] = self.paths[(nearest[0], nearest[1]), (intersect[2][1], intersect[2][0])]
-
-        nearest = self.closestGhost(x - 1, y, notScared,walls)
-        intersect[3] = self.closestIntersect(x - 1, y, (x, y), walls)
-        if intersect[3] != None and nearest != None:
-            distHallwayGhost[3] = self.paths[(nearest[0], nearest[1]), (intersect[3][1], intersect[3][0])]
+        for i in range(0,4):
+            nearest = self.closestGhost(positions[i][0], positions[i][1], notScared,walls)
+            intersect[i] = self.closestIntersect(positions[i][0], positions[i][1], (x, y), walls)
+            if intersect[i] is not None and nearest is not None:
+                distHallwayGhost[i] = self.paths[(nearest[0], nearest[1]), (intersect[i][0], intersect[i][1])]
 
         distHallwayGhost = [0 if q is None else q for q in distHallwayGhost]
 
-        if intersect[0] != None:
-            features["danger-value-0"] = (maxPathLen + features["hallway-0"] - distHallwayGhost[0]) / maxPathLen
-        if intersect[1] != None:
-            features["danger-value-1"] = (maxPathLen + features["hallway-1"] - distHallwayGhost[0]) / maxPathLen
-        if intersect[2] != None:
-            features["danger-value-2"] = (maxPathLen + features["hallway-2"] - distHallwayGhost[0]) / maxPathLen
-        if intersect[3] != None:
-            features["danger-value-3"] = (maxPathLen + features["hallway-3"] - distHallwayGhost[0]) / maxPathLen
+        for i in range(0,4):
+            if intersect[i] is not None:
+                features["danger-value-%i" % i] = (maxPathLen + features["hallway-%i" % i] - distHallwayGhost[i]) / maxPathLen
 
         features.divideAll(10.0)
 
@@ -359,6 +340,9 @@ class SimpleExtractor(FeatureExtractor):
             return None
         for g in ghosts:
             distances.append((self.paths[(int(x), int(y)), (int(g[0]), int(g[1]))],g))
+        if distances == []:
+            return None
+
         gPos0,gPos1 = min(distances, key=lambda q: q[0])[1]
         return int(gPos0),int(gPos1)
 
