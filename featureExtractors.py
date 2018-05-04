@@ -131,57 +131,61 @@ class SimpleExtractor(FeatureExtractor):
         sTime = state.getScaredTime()
         maxPathLen = max([walls.height, walls.width]) * 1.0
         n = 3  # distance instead of 1
+        notScared = list(filter(lambda q: q[1].scaredTimer == 0, zip(ghosts, ghostStates)))
         features = util.Counter()
 
         # compute the location of pacman after he takes the action
         x, y = state.getPacmanPosition()
         dx, dy = Actions.directionToVector(action)
         next_x, next_y = int(x + dx), int(y + dy)
+        nextPositions = self.generateAllNeighboursSimple(x, y)
 
         features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime * 1.0)
         features["bias"] = 1.0
 
         features["#-of-ghosts-1-step-away"] = sum(
             (next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
-        notScared = list(filter(lambda q: q[1].scaredTimer == 0, zip(ghosts, ghostStates)))
+
         features["#-of-not-scared-ghosts-n-steps-away"] = sum(
             self.euclDist(x, y, g[0][0], g[0][1]) < n for g in notScared)
 
-        # features["#-of-ghosts-n-steps-away"] = len(filter(lambda t: t < n, map(lambda q: self.shortestPath(q[0][0],q[0][1],q[1][0],q[1][1],walls),inputList)))
-        # features["#-of-ghosts-n-steps-away"] = sum((next_x,next_y) in Actions.getLegalNeighbors(ns[0],walls) for ns in notScared)
-
-        features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x, y, q[0], q[1]) < n, ghosts)) - len(
-            notScared)
+        features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x, y, q[0], q[1]) < n, ghosts)) - \
+                                         len(notScared)
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:
             features["eats-food"] = 1.0
 
+        # FEATURE: CLOSEST FOOD
+        for i in range (0,4):
+            distFood = closestFood(nextPositions[i], food, walls)
+            if distFood is not None:
+                # make the distance a number less than one otherwise the update
+                # will diverge wildly
+                features["closest-food-%i" % i] = float(distFood) / (walls.width * walls.height)
+
+        # FEATURE: CLOSEST CAPSULE
+        # find all capsules
         capsules = map(lambda q: [False] * len(q), food)
         for cap in state.getCapsules():
             capsules[cap[0]][cap[1]] = True
 
-        distFood = closestFood((next_x, next_y), food, walls)
-        distCapsule = closestFood((next_x, next_y), capsules, walls)
-        if distFood is not None:
-            # make the distance a number less than one otherwise the update
-            # will diverge wildly
-            features["closest-food"] = float(distFood) / (walls.width * walls.height)
-        if distCapsule is not None:
-            features["closest-capsule"] = float(distCapsule) / (walls.width * walls.height)
-
-        positions = self.generateAllNeighboursSimple(x, y)
+        for i in range(0,4):
+            distCapsule = closestFood(nextPositions[i], capsules, walls)
+            if distCapsule is not None:
+                features["closest-capsule-%i" % i] = float(distCapsule) / (walls.width * walls.height)
 
         # FEATURE: HALLWAY
         for i in range(0, 4):
-            features["hallway-%i" % i] = (self.inHallwayRec(positions[i][0], positions[i][1], (x,y), walls) if self.notWall(positions[i][0], positions[i][1], walls) else 0) / maxPathLen
+            features["hallway-%i" % i] = \
+                (self.inHallwayRec(nextPositions[i][0], nextPositions[i][1], (x,y), walls)
+                 if self.notWall(nextPositions[i][0], nextPositions[i][1], walls) else 0) / maxPathLen
 
         # FEATURE: CLOSEST GHOST
         for i in range(0, 4):
-            dist = self.closestGhostDist(positions[i][0], positions[i][1], ghosts, walls)
+            dist = self.closestGhostDist(nextPositions[i][0], nextPositions[i][1], ghosts, walls)
             if dist is not None:
                 features["closest-ghost-%i" % i] = dist / maxPathLen
-
 
         # FEATURE: DANGER VALUE
         distHallwayGhost = [None] * 4
@@ -189,8 +193,8 @@ class SimpleExtractor(FeatureExtractor):
         notScared = map(lambda (a, b): a, notScared)
 
         for i in range(0,4):
-            nearest = self.closestGhost(positions[i][0], positions[i][1], notScared,walls)
-            intersect[i] = self.closestIntersect(positions[i][0], positions[i][1], (x, y), walls)
+            nearest = self.closestGhost(nextPositions[i][0], nextPositions[i][1], notScared,walls)
+            intersect[i] = self.closestIntersect(nextPositions[i][0], nextPositions[i][1], (x, y), walls)
             if intersect[i] is not None and nearest is not None:
                 distHallwayGhost[i] = self.paths[(nearest[0], nearest[1]), (intersect[i][0], intersect[i][1])]
 

@@ -682,9 +682,11 @@ _ORIGINAL_STDOUT = None
 _ORIGINAL_STDERR = None
 _MUTED = False
 
+
 class WritableNull:
     def write(self, string):
         pass
+
 
 def mutePrint():
     global _ORIGINAL_STDOUT, _ORIGINAL_STDERR, _MUTED
@@ -697,6 +699,7 @@ def mutePrint():
     sys.stdout = WritableNull()
     #sys.stderr = WritableNull()
 
+
 def unmutePrint():
     global _ORIGINAL_STDOUT, _ORIGINAL_STDERR, _MUTED
     if not _MUTED:
@@ -705,6 +708,7 @@ def unmutePrint():
 
     sys.stdout = _ORIGINAL_STDOUT
     #sys.stderr = _ORIGINAL_STDERR
+
 
 # TODO choose A* algorithm
 def calculateDistMap(walls):
@@ -733,6 +737,7 @@ def calculateDistMap(walls):
 
     return distMap
 
+
 def lastCrossroad(start, end, cameFrom, walls):
     current = end
     while getLegalNeighbors(current, walls) < 3:
@@ -745,6 +750,7 @@ def lastCrossroad(start, end, cameFrom, walls):
     return current
 
 STEP_SIZE = 1
+
 
 def getLegalNeighbors(position, walls):
     x, y = position
@@ -765,6 +771,7 @@ def getLegalNeighbors(position, walls):
         if not walls[next_x][next_y]: neighbors.append((next_x, next_y))
     return neighbors
 
+
 def shortestPath(start_x,start_y,dest_x,dest_y,walls): # A* algorithm
     if not notWall(start_x,start_y,walls) or not notWall(dest_x,dest_y,walls):
         return []
@@ -784,11 +791,13 @@ def shortestPath(start_x,start_y,dest_x,dest_y,walls): # A* algorithm
                     fx = backwardCost + forwardCost
                     q.push([(x,y),path + [(x,y)],backwardCost],fx)
 
+
 def notWall(x,y,walls):
     y = int(y)
     w = walls[y]
     x = int(x)
     return not w[len(w) - 1 - x]
+
 
 def getNeighboursSimple(x,y,walls):
     width = walls.width
@@ -798,8 +807,10 @@ def getNeighboursSimple(x,y,walls):
     nbrs = filter(lambda q: notWall(q[0],q[1],walls),nbrs) # remove neighbours that aren't walls
     return nbrs
 
+
 def euclDist(x1,y1,x2,y2):
     return np.sqrt(((x1-x2)**2) + ((y1-y2)**2))
+
 
 def generateAllNeighboursSimple(x,y):
     return [(x+1,y),(x,y+1),(x-1,y),(x,y-1)]
