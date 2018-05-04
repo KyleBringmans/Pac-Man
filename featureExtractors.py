@@ -158,11 +158,12 @@ class SimpleExtractor(FeatureExtractor):
 
         # FEATURE: CLOSEST FOOD
         for i in range (0,4):
-            distFood = closestFood(nextPositions[i], food, walls)
-            if distFood is not None:
-                # make the distance a number less than one otherwise the update
-                # will diverge wildly
-                features["closest-food-%i" % i] = float(distFood) / (walls.width * walls.height)
+            if self.notWall(nextPositions[i][0],nextPositions[i][1],walls):
+                distFood = closestFood(nextPositions[i], food, walls)
+                if distFood is not None:
+                    # make the distance a number less than one otherwise the update
+                    # will diverge wildly
+                    features["closest-food-%i" % i] = float(distFood) / (walls.width * walls.height)
 
         # FEATURE: CLOSEST CAPSULE
         # find all capsules
@@ -171,9 +172,10 @@ class SimpleExtractor(FeatureExtractor):
             capsules[cap[0]][cap[1]] = True
 
         for i in range(0,4):
-            distCapsule = closestFood(nextPositions[i], capsules, walls)
-            if distCapsule is not None:
-                features["closest-capsule-%i" % i] = float(distCapsule) / (walls.width * walls.height)
+            if self.notWall(nextPositions[i][0], nextPositions[i][1], walls):
+                distCapsule = closestFood(nextPositions[i], capsules, walls)
+                if distCapsule is not None:
+                    features["closest-capsule-%i" % i] = float(distCapsule) / (walls.width * walls.height)
 
         # FEATURE: HALLWAY
         for i in range(0, 4):
