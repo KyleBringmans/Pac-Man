@@ -724,7 +724,7 @@ def calculateDistMap(walls):
                             #EDITTED-KYLE
                             path = shortestPath(x, y, i, j, walls)
                             if path is None:
-                                distMap[(x, y), (i, j)] = 0
+                                distMap[(x, y), (i, j)] = None
                             else:
                                 distMap[(x, y), (i, j)] = len(path)
                             #EDITTED
