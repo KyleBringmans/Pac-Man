@@ -10,7 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+# TODO: add different maps
 
 """
 Pacman.py holds the logic for the classic pacman game along with the main
@@ -498,12 +498,19 @@ def readCommand( argv ):
     parser = OptionParser(usageStr)
 
     # -------------------------------------------------------------------------------------------------
-    parser.add_option('-n', '--numGames', dest='numGames', type='int',
-                      help=default('the number of GAMES to play'), metavar='GAMES', default=1)
+    parser.add_option('-n', '--numGames1', dest='numGames1', type='int',
+                      help=default('the number of GAMES to play 1'), metavar='GAMES', default=1)
     #-------------------------------------------------------------------------------------------------
     parser.add_option('-l', '--layout', dest='layout',
                       help=default('the LAYOUT_FILE from which to load the map layout'),
                       metavar='LAYOUT_FILE', default='mediumClassic')
+    # EDITTED: new parameter for second layout
+    parser.add_option('-m', '--layout2', dest='layout',
+                      help=default('the second LAYOUT_FILE from which to load the map layout'),
+                      metavar='LAYOUT_FILE', default='mediumClassic')
+    parser.add_option('-y', '--numGames2', dest='numGames2', type='int',
+                      help=default('the number of GAMES to play'), metavar='GAMES', default=1)
+    # EDITTED
     parser.add_option('-p', '--pacman', dest='pacman',
                       help=default('the agent TYPE in the pacmanAgents module to use'),
                       metavar='TYPE', default='KeyboardAgent')
@@ -530,7 +537,7 @@ def readCommand( argv ):
                       help='Comma separated values sent to agent. e.g. "opt1=val1,opt2,opt3=val3"')
     # -------------------------------------------------------------------------------------------------
     parser.add_option('-x', '--numTraining', dest='numTraining', type='int',
-                      help=default('How many episodes are training (suppresses output)'), default=0)
+                      help=default('How many episodes are training (suppresses output) 1'), default=0)
     # -------------------------------------------------------------------------------------------------
     parser.add_option('--frameTime', dest='frameTime', type='float',
                       help=default('Time to delay between frames; <0 means keyboard'), default=0.1)
@@ -550,6 +557,11 @@ def readCommand( argv ):
     # Choose a layout
     args['layout'] = layout.getLayout( options.layout )
     if args['layout'] == None: raise Exception("The layout " + options.layout + " cannot be found")
+
+    # EDITTED
+    args['layout2'] = layout.getLayout( options.layout )
+    if args['layout2'] == None: raise Exception("The layout " + options.layout + " cannot be found")
+    # EDITTED
 
     # Choose a Pacman agent
     noKeyboard = options.gameToReplay == None and (options.textGraphics or options.quietGraphics)
@@ -581,7 +593,8 @@ def readCommand( argv ):
     else:
         import graphicsDisplay
         args['display'] = graphicsDisplay.PacmanGraphics(options.zoom, frameTime = options.frameTime)
-    args['numGames'] = options.numGames
+    args['numGames1'] = options.numGames1
+    args['numGames2'] = options.numGames2
     args['record'] = options.record
     args['catchExceptions'] = options.catchExceptions
     args['timeout'] = options.timeout
@@ -640,7 +653,7 @@ def replayGame( layout, actions, display ):
 
     display.finish()
 
-def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0, catchExceptions=False, timeout=30 ):
+def runGames( layout,layout2, pacman, ghosts, display, numGames1, numGames2, record, numTraining = 0, catchExceptions=False, timeout=30 ):
     import __main__
     __main__.__dict__['_display'] = display
 
@@ -655,9 +668,9 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         if agent.__class__ == qlearningAgents.ApproximateQAgent:
                 agent.featExtractor.paths = distMap
 
-    for i in range( numGames ):
+    for i in range(numGames1):
         # EDITTED
-        print("Training ep. nr:" + str(i))
+        print("(layout 1) Training ep. nr:" + str(i))
         # EDITTED
         beQuiet = i < numTraining
         if beQuiet:
@@ -665,10 +678,11 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             import textDisplay
             gameDisplay = textDisplay.NullGraphics()
             rules.quiet = True
+        #TODO: add different maps
         else:
             gameDisplay = display
             rules.quiet = False
-        game = rules.newGame( layout,agents, gameDisplay, beQuiet, catchExceptions)
+        game = rules.newGame(layout, agents, gameDisplay, beQuiet, catchExceptions)
         game.run()
         if not beQuiet: games.append(game)
 
@@ -680,11 +694,38 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
             cPickle.dump(components, f)
             f.close()
 
+    for i in range(numGames2):
+        # EDITTED
+        print("(layout2) Training ep. nr:" + str(i))
+        # EDITTED
+        beQuiet = i < numTraining
+        if beQuiet:
+            # Suppress output and graphics
+            import textDisplay
+            gameDisplay = textDisplay.NullGraphics()
+            rules.quiet = True
+        # TODO: add different maps
+        else:
+            gameDisplay = display
+            rules.quiet = False
+        game = rules.newGame(layout2, agents, gameDisplay, beQuiet, catchExceptions)
+        game.run()
+
+        if not beQuiet: games.append(game)
+
+        if record:
+            import time, cPickle
+            fname = ('recorded-game-%d' % (i + 1)) + '-'.join([str(t) for t in time.localtime()[1:6]])
+            f = file(fname, 'w')
+            components = {'layout': layout, 'actions': game.moveHistory}
+            cPickle.dump(components, f)
+            f.close()
+
+
     # EDITTED
     print(pacman.getWeights())
     # EDITTED
-
-    if (numGames-numTraining) > 0:
+    if (numGames2-numTraining) > 0:
         scores = [game.state.getScore() for game in games]
         wins = [game.state.isWin() for game in games]
         winRate = wins.count(True)/ float(len(wins))
@@ -706,6 +747,7 @@ if __name__ == '__main__':
 
     > python pacman.py --help
     """
+    #TODO: add different maps
     args = readCommand( sys.argv[1:] ) # Get game components based on input
     runGames( **args )
 
