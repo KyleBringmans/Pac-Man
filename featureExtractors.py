@@ -130,7 +130,7 @@ class SimpleExtractor(FeatureExtractor):
         ghostStates = state.getGhostStates()
         sTime = state.getScaredTime()
         maxPathLen = max([walls.height, walls.width]) * 1.0
-        n = 3  # distance instead of 1
+        n = 1  # distance instead of 1
         features = util.Counter()
 
         # compute the location of pacman after he takes the action
@@ -138,17 +138,22 @@ class SimpleExtractor(FeatureExtractor):
         dx, dy = Actions.directionToVector(action)
         next_x, next_y = int(x + dx), int(y + dy)
 
-        features["scared"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime * 1.0)
+        features["scaredTime"] = (sTime - (self.avgScaredTime(ghostStates))) / (sTime * 1.0)
+
         features["bias"] = 1.0
 
         features["#-of-ghosts-1-step-away"] = sum(
             (next_x, next_y) in Actions.getLegalNeighbors(g, walls) for g in ghosts)
-        notScared = list(filter(lambda q: q[1].scaredTimer == 0, zip(ghosts, ghostStates)))
-        features["#-of-not-scared-ghosts-n-steps-away"] = sum(
-            self.euclDist(x, y, g[0][0], g[0][1]) < n for g in notScared)
 
-        features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x, y, q[0], q[1]) < n, ghosts)) - len(
-            notScared)
+        notScared = list(filter(lambda q: q[1].scaredTimer <= 10, zip(ghosts, ghostStates)))
+        scared = list(filter(lambda q: q[1].scaredTimer > 10, zip(ghosts, ghostStates)))
+
+        features["#-of-notScared-ghosts-1-step-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) <= n for g in notScared)
+        features["#-of-scared-ghosts-1-step-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) <= n for g in scared)
+
+        # features["#-of-ghosts-scared"] = len(filter(lambda q: self.euclDist(x, y, q[0], q[1]) < n, ghosts)) - len(notScared)
+        features["#-of-ghosts-scared"] = len(ghosts) - len(notScared)
+
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and food[next_x][next_y]:

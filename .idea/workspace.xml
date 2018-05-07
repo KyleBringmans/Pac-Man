@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="05ceb907-e9e1-4523-8de5-e5257eedf08a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/game.py" afterPath="$PROJECT_DIR$/game.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/featureExtractors.py" afterPath="$PROJECT_DIR$/featureExtractors.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/layouts/custom.lay" afterPath="$PROJECT_DIR$/layouts/custom.lay" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pacman.py" afterPath="$PROJECT_DIR$/pacman.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="featureExtractors.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="featureExtractors.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/featureExtractors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="126" column="30" lean-forward="false" selection-start-line="126" selection-start-column="30" selection-end-line="126" selection-end-column="30" />
+            <state relative-caret-position="298">
+              <caret line="147" column="92" lean-forward="true" selection-start-line="147" selection-start-column="92" selection-end-line="147" selection-end-column="92" />
               <folding>
                 <element signature="e#717#761#0" expanded="true" />
               </folding>
@@ -38,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="pacman.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="pacman.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pacman.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-991">
-              <caret line="597" column="35" lean-forward="true" selection-start-line="597" selection-start-column="35" selection-end-line="597" selection-end-column="35" />
+            <state relative-caret-position="482">
+              <caret line="569" column="0" lean-forward="false" selection-start-line="569" selection-start-column="0" selection-end-line="569" selection-end-column="0" />
               <folding>
                 <element signature="e#2005#2035#0" expanded="true" />
               </folding>
@@ -103,8 +101,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>setdis</find>
-      <find>eucl</find>
       <find>generateallnei</find>
       <find>paths</find>
       <find>posinpath</find>
@@ -124,7 +120,6 @@
       <find>eaten</find>
       <find>ghost</find>
       <find>rew</find>
-      <find>reward</find>
       <find>rewa</find>
       <find>layout</find>
       <find>training done</find>
@@ -133,6 +128,9 @@
       <find>pacman</find>
       <find>turning off</find>
       <find>run</find>
+      <find>#-of-ghosts-scared</find>
+      <find>numtraining1</find>
+      <find>reward</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -154,10 +152,10 @@
         <option value="$PROJECT_DIR$/layout.py" />
         <option value="$PROJECT_DIR$/util.py" />
         <option value="$PROJECT_DIR$/layouts/mediumClassic.lay" />
-        <option value="$PROJECT_DIR$/featureExtractors.py" />
         <option value="$PROJECT_DIR$/game.py" />
-        <option value="$PROJECT_DIR$/layouts/custom.lay" />
         <option value="$PROJECT_DIR$/pacman.py" />
+        <option value="$PROJECT_DIR$/layouts/custom.lay" />
+        <option value="$PROJECT_DIR$/featureExtractors.py" />
       </list>
     </option>
   </component>
@@ -269,7 +267,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="reinforcement" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pacman.py" />
-      <option name="PARAMETERS" value="-p ApproximateQAgent --quietTextGraphics -a extractor=SimpleExtractor -x 50 -n 50 -y 55 -l custom -m mediumClassic" />
+      <option name="PARAMETERS" value="-p ApproximateQAgent --quietTextGraphics -a extractor=SimpleExtractor -x 100 -n 100 -y 105 -l custom -m mediumClassic" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
@@ -374,9 +372,9 @@
           <option name="timeStamp" value="199" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pacman.py</url>
-          <line>568</line>
-          <option name="timeStamp" value="200" />
+          <url>file://$PROJECT_DIR$/featureExtractors.py</url>
+          <line>147</line>
+          <option name="timeStamp" value="201" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -389,7 +387,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="201" />
+      <option name="time" value="202" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -633,6 +631,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="23" column="26" lean-forward="false" selection-start-line="23" selection-start-column="26" selection-end-line="23" selection-end-column="26" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -681,16 +680,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/featureExtractors.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="126" column="30" lean-forward="false" selection-start-line="126" selection-start-column="30" selection-end-line="126" selection-end-column="30" />
-          <folding>
-            <element signature="e#717#761#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -744,11 +733,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/layouts/custom.lay">
+    <entry file="file://$PROJECT_DIR$/pacman.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="1" column="5" lean-forward="false" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
-          <folding />
+        <state relative-caret-position="482">
+          <caret line="569" column="0" lean-forward="false" selection-start-line="569" selection-start-column="0" selection-end-line="569" selection-end-column="0" />
+          <folding>
+            <element signature="e#2005#2035#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -760,12 +751,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pacman.py">
+    <entry file="file://$PROJECT_DIR$/layouts/custom.lay">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-991">
-          <caret line="597" column="35" lean-forward="true" selection-start-line="597" selection-start-column="35" selection-end-line="597" selection-end-column="35" />
+        <state relative-caret-position="48">
+          <caret line="1" column="5" lean-forward="false" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/featureExtractors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="147" column="92" lean-forward="true" selection-start-line="147" selection-start-column="92" selection-end-line="147" selection-end-column="92" />
           <folding>
-            <element signature="e#2005#2035#0" expanded="true" />
+            <element signature="e#717#761#0" expanded="true" />
           </folding>
         </state>
       </provider>
