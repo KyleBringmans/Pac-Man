@@ -784,17 +784,17 @@ def shortestPath(start_x,start_y,dest_x,dest_y,walls): # A* algorithm
                     fx = backwardCost + forwardCost
                     q.push([(x,y),path + [(x,y)],backwardCost],fx)
 
-def notWall(x,y,walls):
-    y = int(y)
-    w = walls[y]
-    x = int(x)
-    return not w[len(w) - 1 - x]
+
+def notWall(x, y, walls):
+    if x > walls.width - 1 or y > walls.height - 1:
+        return False
+    return not walls[int(x)][int(y)]
 
 def getNeighboursSimple(x,y,walls):
     width = walls.width
     height = walls.height
     nbrs = generateAllNeighboursSimple(x,y)
-    nbrs = filter(lambda q: q[1] < width >= 0 and q[0] < height >= 0, nbrs) # keep nbrs in grid
+    nbrs = filter(lambda q: q[1] < height >= 0 and q[0] < width >= 0, nbrs) # keep nbrs in grid
     nbrs = filter(lambda q: notWall(q[0],q[1],walls),nbrs) # remove neighbours that aren't walls
     return nbrs
 
