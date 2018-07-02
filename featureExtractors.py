@@ -142,16 +142,14 @@ class SimpleExtractor(FeatureExtractor):
 
         features["bias"] = 1.0
 
-        features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls)
-                                                  for g in ghosts)
+        features["#-of-ghosts-1-step-away"] = sum((next_x, next_y) in Actions.getLegalNeighbors(g, walls)for g in ghosts)
 
         ghostCombo = zip(ghosts, ghostStates)
 
         notScared = list(filter(lambda q: q[1].scaredTimer <= 10, ghostCombo))
         scared = [g for g in ghostCombo if g not in notScared]
 
-        features["#-of-notScared-ghosts-n-steps-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) <= n for g in notScared)
-        features["#-of-scared-ghosts-n-steps-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) <= n for g in scared)
+        features["#-of-notScared-ghosts-1-steps-away"] = sum(self.euclDist(x, y, g[0][0], g[0][1]) <= n for g in notScared)
 
         features["#-of-ghosts-scared"] = len(ghosts) - len(notScared)
 
@@ -174,18 +172,12 @@ class SimpleExtractor(FeatureExtractor):
 
         # FEATURE: HALLWAY
         if self.notWall(next_x, next_y, walls):
-            features["hallway"] = self.inHallwayRec(next_x, next_y, (x, y),walls) / maxPathLen
-
-        # FEATURE: NEIGHBOURING WALLS
-        if self.notWall(next_x, next_y, walls):
-            features["isWall"] = 0
-        else:
-            features["isWall"] = 1
+            hallway = self.inHallwayRec(next_x, next_y, (x, y),walls) / maxPathLen
 
         # FEATURE: CLOSEST GHOST
-        dist = self.closestGhostDist(next_x, next_y, ghosts, walls)
-        if dist is not None:
-            features["closest-ghost"] = dist / maxPathLen
+        #dist = self.closestGhostDist(next_x, next_y, ghosts, walls)
+        #if dist is not None:
+        #    features["closest-ghost"] = dist / maxPathLen
 
         # FEATURE: DANGER VALUE
         notScared = map(lambda (a, b): a, notScared)
@@ -197,7 +189,7 @@ class SimpleExtractor(FeatureExtractor):
 
         distHallwayGhost = 0 if distHallwayGhost is None else distHallwayGhost
 
-        features["danger-value"] = (maxPathLen + features["hallway"] - distHallwayGhost) / maxPathLen
+        features["danger-value"] = (maxPathLen + hallway - distHallwayGhost) / maxPathLen
 
         features.divideAll(10.0)
 
@@ -279,7 +271,7 @@ class SimpleExtractor(FeatureExtractor):
         width = walls.width
         height = walls.height
         nbrs = self.generateAllNeighboursSimple(x, y)
-        nbrs = filter(lambda q: q[1] < width >= 0 and q[0] < height >= 0, nbrs)  # keep nbrs in grid
+        nbrs = filter(lambda q: q[1] < height >= 0 and q[0] < width >= 0, nbrs)  # keep nbrs in grid
         nbrs = filter(lambda q: self.notWall(q[0], q[1], walls), nbrs)  # remove neighbours that aren't walls
         return nbrs
 
