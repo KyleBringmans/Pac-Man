@@ -173,7 +173,8 @@ class SimpleExtractor(FeatureExtractor):
             features["closest-capsule"] = float(distCapsule) / (walls.width * walls.height)
 
         # FEATURE: HALLWAY
-        features["hallway"] = (self.inHallwayRec(next_x, next_y, (x, y),walls) if self.notWall(next_x, next_y, walls) else 0) / maxPathLen
+        if self.notWall(next_x, next_y, walls):
+            features["hallway"] = self.inHallwayRec(next_x, next_y, (x, y),walls) / maxPathLen
 
         # FEATURE: NEIGHBOURING WALLS
         if self.notWall(next_x, next_y, walls):
