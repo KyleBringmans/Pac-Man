@@ -682,6 +682,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
 
     # EDITTED
     print(pacman.getWeights())
+    print(pacman.getWeightsScared())
     # EDITTED
 
     if (numGames-numTraining) > 0:
