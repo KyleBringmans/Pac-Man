@@ -515,10 +515,10 @@ class ApproximateQAgent(PacmanQAgent):
     def __init__(self, extractor='IdentityExtractor', **args):
         self.featExtractor = util.lookup(extractor, globals())()
         PacmanQAgent.__init__(self, **args)
-        self.weights = util.Counter()
+        self.weightsNScared = util.Counter()
 
-    def getWeights(self):
-        return self.weights
+    def getWeightsNScared(self):
+        return self.weightsNScared
 
     def getQValue(self, state, action):
         """
@@ -529,7 +529,7 @@ class ApproximateQAgent(PacmanQAgent):
 
         q = 0
         for feat in features:   # Q(s,a) = Sum: i -> n : f_i(s,a)*w_i
-            q += features[feat] * self.getWeights()[feat] # formula summed over
+            q += features[feat] * self.getWeightsNScared()[feat] # formula summed over
         return q
 
     def update(self, state, action, nextState, reward):
@@ -539,9 +539,7 @@ class ApproximateQAgent(PacmanQAgent):
         features = self.featExtractor.getFeatures(state,action)
         difference = reward + self.discount * self.computeValueFromQValues(nextState) - self.getQValue(state,action) # seperate because it doesn't work otherwise :///
         for feat in features:
-            self.weights[feat] += self.alpha * difference * features[feat] # w_i + alfa * difference * f_i(s,a)
-
-        #print(self.weights)
+            self.weightsNScared[feat] += self.alpha * difference * features[feat] # w_i + alfa * difference * f_i(s,a)
 
     def final(self, state):
         "Called at the end of each game."

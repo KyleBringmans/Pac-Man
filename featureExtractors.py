@@ -159,13 +159,10 @@ class SimpleExtractor(FeatureExtractor):
             capsules[cap[0]][cap[1]] = True
 
         distFood = closestFood((next_x, next_y), food, walls)
-        distCapsule = closestFood((next_x, next_y), capsules, walls)
         if distFood is not None:
             # make the distance a number less than one otherwise the update
             # will diverge wildly
             features["closest-food"] = float(distFood) / (walls.width * walls.height)
-        if distCapsule is not None:
-            features["closest-capsule"] = float(distCapsule) / (walls.width * walls.height)
 
         positions = self.generateAllNeighboursSimple(x, y)
 
