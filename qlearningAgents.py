@@ -214,10 +214,10 @@ class ApproximateQAgent(PacmanQAgent):
         p = state.data.agentStates[0].configuration.pos
         g1 = state.data.agentStates[1]
         g2 = state.data.agentStates[2]
-        distg1 = util.euclDist(p[0], p[1], g1.configuration.pos[0],
-                               g1.configuration.pos[1])
-        distg2 = util.euclDist(p[0], p[1], g2.configuration.pos[0],
-                               g2.configuration.pos[1])
+        #distg1 = util.euclDist(p[0], p[1], g1.configuration.pos[0],g1.configuration.pos[1])
+        #distg2 = util.euclDist(p[0], p[1], g2.configuration.pos[0],g2.configuration.pos[1])
+        distg1 = self.featExtractor.paths[(p[0], p[1]), (int(g1.configuration.pos[0]), int(g1.configuration.pos[1]))]
+        distg2 = self.featExtractor.paths[(p[0], p[1]), (int(g2.configuration.pos[0]), int(g2.configuration.pos[1]))]
         if (g1.scaredTimer > 0 and distg1 < distg2) or (g2.scaredTimer > 0 and distg2 < distg1):
             useOtherVector = True
 
@@ -244,8 +244,8 @@ class ApproximateQAgent(PacmanQAgent):
         p = state.data.agentStates[0].configuration.pos
         g1 = state.data.agentStates[1]
         g2 = state.data.agentStates[2]
-        distg1 = util.euclDist(p[0], p[1], g1.configuration.pos[0], g1.configuration.pos[1])
-        distg2 = util.euclDist(p[0], p[1], g2.configuration.pos[0], g2.configuration.pos[1])
+        distg1 = self.featExtractor.paths[(p[0], p[1]), (int(g1.configuration.pos[0]), int(g1.configuration.pos[1]))]
+        distg2 = self.featExtractor.paths[(p[0], p[1]), (int(g2.configuration.pos[0]), int(g2.configuration.pos[1]))]
         if (g1.scaredTimer > 0 and distg1 < distg2) or (g2.scaredTimer > 0 and distg2 < distg1):
             useOtherVector = True
 
